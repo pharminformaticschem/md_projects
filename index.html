@@ -3,19 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BioSim Project Portal</title>
+    <title>HeroMDAnalysis | MD Simulation Portal</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://jsme-editor.github.io/dist/jsme/jsme.nocache.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background: #0f172a; color: white; }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        .input-dark { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px; width: 100%; color: white; }
-        .btn-cyan { background: #0891b2; transition: 0.3s; }
-        .btn-cyan:hover { background: #22d3ee; transform: translateY(-1px); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #020617; color: #f8fafc; }
+        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); }
+        .input-pro { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 12px; width: 100%; color: white; transition: 0.2s; }
+        .input-pro:focus { border-color: #06b6d4; outline: none; box-shadow: 0 0 0 2px rgba(6,182,212,0.2); }
+        .step-pill { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid #334155; color: #64748b; }
+        .step-active { border-color: #06b6d4; color: #06b6d4; background: rgba(6,182,212,0.1); }
+        .btn-primary { background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%); transition: 0.3s; box-shadow: 0 4px 14px 0 rgba(6,182,212,0.3); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px 0 rgba(6,182,212,0.4); }
     </style>
 </head>
 <body>
@@ -27,121 +30,175 @@
         const App = () => {
             const [step, setStep] = useState(1);
             const [loading, setLoading] = useState(false);
-            const [discounts, setDiscounts] = useState({});
+            const [trackingId, setTrackingId] = useState(new URLSearchParams(window.location.search).get('track'));
+            const [statusInfo, setStatusInfo] = useState(null);
             const [files, setFiles] = useState([]);
+            
             const [formData, setFormData] = useState({
-                name: '', project: '', service: 'Both',
+                name: '', email: '', phone: '', affiliation: '', designation: '',
+                project: '', disease: '', receptor: '', apoprotein: '',
+                test_ligands: '', ref_ligands: '',
+                complexes: Array(8).fill(''),
                 pdbs: [], mdJobs: 1, duration: 100, voucher: '', totalAtoms: 0
             });
 
-            const RATE = 2000 / (300 * 100); // Your specified rate
-            const GAS_URL = "https://script.google.com/macros/s/AKfycbww0jUeSw9-LtJGWoHCE0zSWEZ4V41R-2jlouvLSPQ9qJsOnRLkA5yCubmjYDxbJHTK5g/exec"; 
+            const GAS_URL = "https://script.google.com/macros/s/AKfycbxb7sYz9zLrWd-M9ZWJoG0nxnut_SHO3t3Qq7K40ETlUcgl93I3WdAhqtPin67cGsq7hA/exec"; 
 
+            // Tiered Scholar Pricing Logic
+            const calculatePrice = () => {
+                const n = parseInt(formData.mdJobs);
+                let price = 0;
+                if (n === 1) price = 2000;
+                else if (n === 2) price = 4000;
+                else if (n >= 3 && n <= 5) price = 7500;
+                else if (n > 5 && n <= 10) price = 13000;
+                else price = 17000;
+
+                const raw = n * 2000;
+                return { raw, final: price, savings: raw - price };
+            };
+
+            // Tracking Logic
             useEffect(() => {
-                fetch('./discounts.json').then(r => r.json()).then(setDiscounts).catch(() => {});
-            }, []);
+                if (trackingId) {
+                    fetch(`${GAS_URL}?track=${trackingId}`)
+                        .then(r => r.json())
+                        .then(data => setStatusInfo(data));
+                }
+            }, [trackingId]);
 
             const fetchPDB = async (id) => {
-                if(id.length !== 4) return;
+                if(!id || id.length !== 4) return;
                 try {
                     const res = await fetch(`https://data.rcsb.org/rest/v1/core/entry/${id.toLowerCase()}`);
                     const data = await res.json();
                     const atoms = data.rcsb_entry_info.deposited_atom_count;
-                    setFormData(prev => ({ ...prev, totalAtoms: prev.totalAtoms + atoms, pdbs: [...prev.pdbs, id] }));
-                } catch (e) { alert("Invalid PDB ID"); }
-            };
-
-            const handleFileUpload = async (e) => {
-                const uploaded = await Promise.all(Array.from(e.target.files).map(file => {
-                    return new Promise(res => {
-                        const reader = new FileReader();
-                        reader.onload = (e) => res({ name: file.name, mimeType: file.type, content: e.target.result });
-                        reader.readAsDataURL(file);
-                    });
-                }));
-                setFiles([...files, ...uploaded]);
-            };
-
-            const calculatePrice = () => {
-                const raw = formData.totalAtoms * formData.duration * formData.mdJobs * RATE;
-                const discObj = discounts[formData.voucher.toUpperCase()] || { value: 0 };
-                const savings = raw * (discObj.value / 100);
-                return { raw: Math.round(raw), final: Math.round(raw - savings) };
+                    if(!formData.pdbs.includes(id.toUpperCase())) {
+                        setFormData(prev => ({ ...prev, totalAtoms: prev.totalAtoms + atoms, pdbs: [...prev.pdbs, id.toUpperCase()] }));
+                    }
+                } catch (e) { alert("PDB Data not found for: " + id); }
             };
 
             const submit = async () => {
                 setLoading(true);
-                const pricing = calculatePrice();
-                const payload = { ...formData, pricing, files };
+                const payload = { ...formData, pricing: calculatePrice(), files };
                 try {
-                    await fetch(GAS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                    alert("Success! Check your local folder in a few moments.");
+                    const res = await fetch(GAS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+                    alert("Submission Received! Check your email for tracking ID.");
                     window.location.reload();
-                } catch (e) { alert("Upload failed"); }
+                } catch (e) { alert("Submission failed. Check connection."); }
                 setLoading(false);
             };
 
+            if (trackingId) return (
+                <div className="max-w-2xl mx-auto py-20 px-6">
+                    <div className="glass p-10 rounded-3xl text-center">
+                        <h2 className="text-3xl font-bold text-cyan-400 mb-6">Project Tracker</h2>
+                        <div className="text-slate-400 mb-2">Project ID: {trackingId}</div>
+                        <div className="text-6xl font-black mb-8">{statusInfo ? statusInfo.status : 'Loading...'}</div>
+                        <button onClick={() => window.location.href = window.location.pathname} className="text-cyan-500 underline text-sm">Back to Home</button>
+                    </div>
+                </div>
+            );
+
             return (
-                <div className="max-w-5xl mx-auto py-12 px-6">
-                    <div className="flex justify-between items-end mb-12">
-                        <div>
-                            <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">BioSim Intake</h1>
-                            <p className="text-slate-400 mt-2">Professional Molecular Dynamics & Docking Portal</p>
+                <div className="max-w-6xl mx-auto py-12 px-6">
+                    <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
+                        <div className="text-center md:text-left">
+                            <h1 className="text-5xl font-black tracking-tight text-white mb-2">BioSim <span className="text-cyan-500">Intake</span></h1>
+                            <p className="text-slate-400">Computational Chemistry & MD Simulation Hub</p>
                         </div>
-                        <div className="text-right">
-                            <div className="text-sm text-slate-500">Estimated Price</div>
-                            <div className="text-3xl font-bold text-cyan-400">₹{calculatePrice().final}</div>
+                        <div className="flex gap-4">
+                            {[1, 2, 3, 4].map(s => (
+                                <div key={s} className={`step-pill ${step >= s ? 'step-active' : ''}`}>{s}</div>
+                            ))}
                         </div>
                     </div>
 
-                    <div className="glass p-8 rounded-3xl shadow-2xl grid grid-cols-1 md:grid-cols-2 gap-12">
-                        <div className="space-y-6">
-                            <section>
-                                <label className="block text-sm font-semibold mb-2 text-slate-300">COLLABORATOR & PROJECT</label>
-                                <input className="input-dark mb-3" placeholder="Collaborator Name" onChange={e => setFormData({...formData, name: e.target.value})} />
-                                <input className="input-dark" placeholder="Project Short Name" onChange={e => setFormData({...formData, project: e.target.value})} />
-                            </section>
-
-                            <section>
-                                <label className="block text-sm font-semibold mb-2 text-slate-300">PROTEIN DATA (PDB ID)</label>
-                                <div className="flex gap-2">
-                                    <input id="pdb_in" className="input-dark" placeholder="e.g. 1A8W" />
-                                    <button onClick={() => fetchPDB(document.getElementById('pdb_in').value)} className="bg-slate-700 px-4 rounded-lg">Add</button>
+                    <div className="glass rounded-[2rem] overflow-hidden shadow-2xl flex flex-col md:flex-row min-h-[600px]">
+                        {/* LEFT: INPUT AREA */}
+                        <div className="flex-1 p-8 md:p-12 border-b md:border-b-0 md:border-r border-slate-800">
+                            {step === 1 && (
+                                <div className="space-y-6 animate-fadeIn">
+                                    <h3 className="text-2xl font-bold mb-6">User Identification</h3>
+                                    <input className="input-pro" placeholder="Full Name" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <input className="input-pro" placeholder="Email Address" onChange={e => setFormData({...formData, email: e.target.value})} />
+                                        <input className="input-pro" placeholder="Phone Number" onChange={e => setFormData({...formData, phone: e.target.value})} />
+                                    </div>
+                                    <input className="input-pro" placeholder="Institution / Organization" onChange={e => setFormData({...formData, affiliation: e.target.value})} />
+                                    <input className="input-pro" placeholder="Designation (e.g. Research Scholar)" onChange={e => setFormData({...formData, designation: e.target.value})} />
+                                    <button onClick={() => setStep(2)} className="w-full btn-primary py-4 rounded-xl font-bold mt-4">Next: Project Context</button>
                                 </div>
-                                <div className="flex gap-2 mt-2">{formData.pdbs.map(p => <span className="text-xs bg-cyan-900 px-2 py-1 rounded">{p}</span>)}</div>
-                            </section>
+                            )}
 
-                            <section>
-                                <label className="block text-sm font-semibold mb-2 text-slate-300">LIGAND DRAWING</label>
-                                <div id="jsme_container" className="rounded-xl overflow-hidden border border-slate-700"></div>
-                            </section>
+                            {step === 2 && (
+                                <div className="space-y-4">
+                                    <h3 className="text-2xl font-bold mb-6">Scientific Parameters</h3>
+                                    <input className="input-pro" placeholder="Project Short Name" onChange={e => setFormData({...formData, project: e.target.value})} />
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <input className="input-pro" placeholder="Disease/Target" onChange={e => setFormData({...formData, disease: e.target.value})} />
+                                        <input className="input-pro" placeholder="Receptor Name" onChange={e => setFormData({...formData, receptor: e.target.value})} />
+                                    </div>
+                                    <textarea className="input-pro h-24" placeholder="Test Ligands (SMILES or IDs)" onChange={e => setFormData({...formData, test_ligands: e.target.value})}></textarea>
+                                    <input className="input-pro" placeholder="Reference Ligand Name" onChange={e => setFormData({...formData, ref_ligands: e.target.value})} />
+                                    <button onClick={() => setStep(3)} className="w-full btn-primary py-4 rounded-xl font-bold mt-4">Next: Molecular Setup</button>
+                                </div>
+                            )}
+
+                            {step === 3 && (
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <input className="input-pro" placeholder="Apoprotein Name" onChange={e => setFormData({...formData, apoprotein: e.target.value})} />
+                                        <input className="input-pro" placeholder="Main PDB ID (Auto-fetches on blur)" onBlur={e => fetchPDB(e.target.value)} />
+                                    </div>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                        {formData.complexes.map((c, i) => (
+                                            <input key={i} className="input-pro text-xs" placeholder={`Complex ${i+1}`} 
+                                            onChange={e => {
+                                                const newC = [...formData.complexes];
+                                                newC[i] = e.target.value;
+                                                setFormData({...formData, complexes: newC});
+                                            }} />
+                                        ))}
+                                    </div>
+                                    <div id="jsme_container" className="rounded-xl overflow-hidden border border-slate-700 bg-white"></div>
+                                    <button onClick={() => setStep(4)} className="w-full btn-primary py-4 rounded-xl font-bold mt-4">Review & Pricing</button>
+                                </div>
+                            )}
+
+                            {step === 4 && (
+                                <div className="space-y-6">
+                                    <h3 className="text-2xl font-bold">Simulation Details</h3>
+                                    <div className="grid grid-cols-2 gap-6">
+                                        <div><label className="text-xs text-slate-500 uppercase">Number of Jobs</label><input type="number" className="input-pro" value={formData.mdJobs} onChange={e => setFormData({...formData, mdJobs: e.target.value})} /></div>
+                                        <div><label className="text-xs text-slate-500 uppercase">Duration (ns)</label><input type="number" className="input-pro" value={formData.duration} onChange={e => setFormData({...formData, duration: e.target.value})} /></div>
+                                    </div>
+                                    <input className="input-pro border-dashed border-cyan-500/50" placeholder="Discount Voucher" onChange={e => setFormData({...formData, voucher: e.target.value})} />
+                                    <button onClick={submit} disabled={loading} className="w-full btn-primary py-4 rounded-xl font-bold text-lg mt-4">
+                                        {loading ? "Initializing Simulation Workspace..." : "Confirm & Submit Project"}
+                                    </button>
+                                </div>
+                            )}
                         </div>
 
-                        <div className="space-y-6 border-l border-slate-800 pl-0 md:pl-12">
-                            <section>
-                                <label className="block text-sm font-semibold mb-2 text-slate-300">SIMULATION PARAMETERS</label>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div><p className="text-xs text-slate-500 mb-1">Jobs</p><input type="number" className="input-dark" value={formData.mdJobs} onChange={e => setFormData({...formData, mdJobs: e.target.value})} /></div>
-                                    <div><p className="text-xs text-slate-500 mb-1">Duration (ns)</p><input type="number" className="input-dark" value={formData.duration} onChange={e => setFormData({...formData, duration: e.target.value})} /></div>
+                        {/* RIGHT: PRICING SIDEBAR */}
+                        <div className="w-full md:w-[320px] p-8 bg-slate-900/50 flex flex-col justify-between">
+                            <div>
+                                <h4 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-6">Price Summary</h4>
+                                <div className="space-y-4">
+                                    <div className="flex justify-between"><span>Base Rate</span><span>₹{calculatePrice().raw}</span></div>
+                                    <div className="flex justify-between text-green-400"><span>Scholar Discount</span><span>-₹{calculatePrice().savings}</span></div>
+                                    <div className="border-t border-slate-800 pt-4 flex justify-between items-end">
+                                        <span className="text-lg">Total</span>
+                                        <span className="text-4xl font-bold text-cyan-400">₹{calculatePrice().final}</span>
+                                    </div>
                                 </div>
-                            </section>
-
-                            <section>
-                                <label className="block text-sm font-semibold mb-2 text-slate-300">FILE UPLOADS (MOL2, MAE, DOCX)</label>
-                                <input type="file" multiple onChange={handleFileUpload} className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-cyan-900 file:text-cyan-100 hover:file:bg-cyan-800" />
-                                <div className="mt-2 max-h-20 overflow-y-auto italic text-xs text-slate-500">
-                                    {files.map((f,i) => <div key={i}>• {f.name}</div>)}
-                                </div>
-                            </section>
-
-                            <section>
-                                <label className="block text-sm font-semibold mb-2 text-slate-300">DISCOUNT VOUCHER</label>
-                                <input className="input-dark border-dashed border-cyan-500/50" placeholder="Enter Code" onChange={e => setFormData({...formData, voucher: e.target.value})} />
-                            </section>
-
-                            <button onClick={submit} disabled={loading} className="w-full btn-cyan py-4 rounded-2xl font-bold text-lg shadow-lg shadow-cyan-500/20">
-                                {loading ? "Processing Data..." : "Submit Project Request"}
-                            </button>
+                            </div>
+                            <div className="mt-12 bg-cyan-950/30 p-4 rounded-xl border border-cyan-900/50 text-xs text-cyan-200">
+                                <p className="font-bold mb-1 italic">🔒 Privacy Disclaimer</p>
+                                All biological data and chemical structures are processed on your private Ubuntu workspace. No PII is shared with third parties.
+                            </div>
                         </div>
                     </div>
                 </div>
