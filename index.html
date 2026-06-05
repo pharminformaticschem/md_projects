@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioSim Project Portal</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" src="https://jsme-editor.github.io/dist/jsme/jsme.nocache.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #0f172a; color: white; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .input-dark { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px; width: 100%; color: white; }
+        .btn-cyan { background: #0891b2; transition: 0.3s; }
+        .btn-cyan:hover { background: #22d3ee; transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const App = () => {
+            const [step, setStep] = useState(1);
+            const [loading, setLoading] = useState(false);
+            const [discounts, setDiscounts] = useState({});
+            const [files, setFiles] = useState([]);
+            const [formData, setFormData] = useState({
+                name: '', project: '', service: 'Both',
+                pdbs: [], mdJobs: 1, duration: 100, voucher: '', totalAtoms: 0
+            });
+
+            const RATE = 2000 / (300 * 100); // Your specified rate
+            const GAS_URL = "https://script.google.com/macros/s/AKfycbwF3E5tUDPWxjbgCCb46PJkmfRwFW4uVyffLeSgm8jr5B9IUwY2d6C6QnY37oiTonhCBA/exec"; 
+
+            useEffect(() => {
+                fetch('./discounts.json').then(r => r.json()).then(setDiscounts).catch(() => {});
+            }, []);
+
+            const fetchPDB = async (id) => {
+                if(id.length !== 4) return;
+                try {
+                    const res = await fetch(`https://data.rcsb.org/rest/v1/core/entry/${id.toLowerCase()}`);
+                    const data = await res.json();
+                    const atoms = data.rcsb_entry_info.deposited_atom_count;
+                    setFormData(prev => ({ ...prev, totalAtoms: prev.totalAtoms + atoms, pdbs: [...prev.pdbs, id] }));
+                } catch (e) { alert("Invalid PDB ID"); }
+            };
+
+            const handleFileUpload = async (e) => {
+                const uploaded = await Promise.all(Array.from(e.target.files).map(file => {
+                    return new Promise(res => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => res({ name: file.name, mimeType: file.type, content: e.target.result });
+                        reader.readAsDataURL(file);
+                    });
+                }));
+                setFiles([...files, ...uploaded]);
+            };
+
+            const calculatePrice = () => {
+                const raw = formData.totalAtoms * formData.duration * formData.mdJobs * RATE;
+                const discObj = discounts[formData.voucher.toUpperCase()] || { value: 0 };
+                const savings = raw * (discObj.value / 100);
+                return { raw: Math.round(raw), final: Math.round(raw - savings) };
+            };
+
+            const submit = async () => {
+                setLoading(true);
+                const pricing = calculatePrice();
+                const payload = { ...formData, pricing, files };
+                try {
+                    await fetch(GAS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+                    alert("Success! Check your local folder in a few moments.");
+                    window.location.reload();
+                } catch (e) { alert("Upload failed"); }
+                setLoading(false);
+            };
+
+            return (
+                <div className="max-w-5xl mx-auto py-12 px-6">
+                    <div className="flex justify-between items-end mb-12">
+                        <div>
+                            <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">BioSim Intake</h1>
+                            <p className="text-slate-400 mt-2">Professional Molecular Dynamics & Docking Portal</p>
+                        </div>
+                        <div className="text-right">
+                            <div className="text-sm text-slate-500">Estimated Price</div>
+                            <div className="text-3xl font-bold text-cyan-400">₹{calculatePrice().final}</div>
+                        </div>
+                    </div>
+
+                    <div className="glass p-8 rounded-3xl shadow-2xl grid grid-cols-1 md:grid-cols-2 gap-12">
+                        <div className="space-y-6">
+                            <section>
+                                <label className="block text-sm font-semibold mb-2 text-slate-300">COLLABORATOR & PROJECT</label>
+                                <input className="input-dark mb-3" placeholder="Collaborator Name" onChange={e => setFormData({...formData, name: e.target.value})} />
+                                <input className="input-dark" placeholder="Project Short Name" onChange={e => setFormData({...formData, project: e.target.value})} />
+                            </section>
+
+                            <section>
+                                <label className="block text-sm font-semibold mb-2 text-slate-300">PROTEIN DATA (PDB ID)</label>
+                                <div className="flex gap-2">
+                                    <input id="pdb_in" className="input-dark" placeholder="e.g. 1A8W" />
+                                    <button onClick={() => fetchPDB(document.getElementById('pdb_in').value)} className="bg-slate-700 px-4 rounded-lg">Add</button>
+                                </div>
+                                <div className="flex gap-2 mt-2">{formData.pdbs.map(p => <span className="text-xs bg-cyan-900 px-2 py-1 rounded">{p}</span>)}</div>
+                            </section>
+
+                            <section>
+                                <label className="block text-sm font-semibold mb-2 text-slate-300">LIGAND DRAWING</label>
+                                <div id="jsme_container" className="rounded-xl overflow-hidden border border-slate-700"></div>
+                            </section>
+                        </div>
+
+                        <div className="space-y-6 border-l border-slate-800 pl-0 md:pl-12">
+                            <section>
+                                <label className="block text-sm font-semibold mb-2 text-slate-300">SIMULATION PARAMETERS</label>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div><p className="text-xs text-slate-500 mb-1">Jobs</p><input type="number" className="input-dark" value={formData.mdJobs} onChange={e => setFormData({...formData, mdJobs: e.target.value})} /></div>
+                                    <div><p className="text-xs text-slate-500 mb-1">Duration (ns)</p><input type="number" className="input-dark" value={formData.duration} onChange={e => setFormData({...formData, duration: e.target.value})} /></div>
+                                </div>
+                            </section>
+
+                            <section>
+                                <label className="block text-sm font-semibold mb-2 text-slate-300">FILE UPLOADS (MOL2, MAE, DOCX)</label>
+                                <input type="file" multiple onChange={handleFileUpload} className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-cyan-900 file:text-cyan-100 hover:file:bg-cyan-800" />
+                                <div className="mt-2 max-h-20 overflow-y-auto italic text-xs text-slate-500">
+                                    {files.map((f,i) => <div key={i}>• {f.name}</div>)}
+                                </div>
+                            </section>
+
+                            <section>
+                                <label className="block text-sm font-semibold mb-2 text-slate-300">DISCOUNT VOUCHER</label>
+                                <input className="input-dark border-dashed border-cyan-500/50" placeholder="Enter Code" onChange={e => setFormData({...formData, voucher: e.target.value})} />
+                            </section>
+
+                            <button onClick={submit} disabled={loading} className="w-full btn-cyan py-4 rounded-2xl font-bold text-lg shadow-lg shadow-cyan-500/20">
+                                {loading ? "Processing Data..." : "Submit Project Request"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+
+        function jsmeOnLoad() { 
+            window.jsmeApplet = new JSME.JSME("jsme_container", "100%", "280px", { "options" : "oldlook,noxbutton" }); 
+        }
+    </script>
+</body>
+</html>
