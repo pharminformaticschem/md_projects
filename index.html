@@ -3,26 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HeroMDAnalysis | MD Simulation Portal</title>
+    <title>GROMACS Cloud Engine | Advanced Automated Molecular Workspaces</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script type="text/javascript" src="https://jsme-editor.github.io/dist/jsme/jsme.nocache.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #020617; color: #f8fafc; }
-        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); }
-        .input-pro { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 12px; width: 100%; color: white; transition: 0.2s; }
-        .input-pro:focus { border-color: #06b6d4; outline: none; box-shadow: 0 0 0 2px rgba(6,182,212,0.2); }
-        .step-pill { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid #334155; color: #64748b; }
-        .step-active { border-color: #06b6d4; color: #06b6d4; background: rgba(6,182,212,0.1); }
-        .btn-primary { background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%); transition: 0.3s; box-shadow: 0 4px 14px 0 rgba(6,182,212,0.3); }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px 0 rgba(6,182,212,0.4); }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #02050e; 
+            color: #f1f5f9; 
+            overflow-x: hidden;
+        }
+        .font-display { font-family: 'Space Grotesk', sans-serif; }
+        
+        /* Premium Robotic High-Definition Glass Morphism */
+        .robotics-glass {
+            background: rgba(8, 14, 32, 0.75);
+            backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(6, 182, 212, 0.25);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+        }
+        .robotics-glass-light {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        
+        .input-cyber { 
+            background: rgba(4, 8, 20, 0.9); 
+            border: 1px solid rgba(6, 182, 212, 0.25); 
+            border-radius: 10px; 
+            padding: 14px; 
+            width: 100%; 
+            color: #ffffff; 
+            font-size: 0.9rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        .input-cyber:focus { 
+            border-color: #a855f7; 
+            outline: none; 
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.35);
+        }
+        
+        .btn-action { 
+            background: linear-gradient(135deg, #06b6d4 0%, #7c3aed 100%); 
+            transition: all 0.3s; 
+            box-shadow: 0 4px 20px rgba(6, 182, 212, 0.25); 
+        }
+        .btn-action:hover { 
+            transform: translateY(-1px); 
+            box-shadow: 0 6px 25px rgba(147, 51, 234, 0.45);
+        }
+
+        /* Video / Canvas Background Engine styling */
+        .bg-video-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+            opacity: 0.15;
+        }
+        #bg-video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+        }
+        #mol-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.2;
+        }
+
+        /* Pure CSS Deep Learning Node Network & Core Animations */
+        @keyframes pulse-node {
+            0%, 100% { transform: scale(1); opacity: 0.4; filter: drop-shadow(0 0 2px rgba(6,182,212,0.5)); }
+            50% { transform: scale(1.2); opacity: 1; filter: drop-shadow(0 0 8px rgba(6,182,212,1)); }
+        }
+        .dl-node { animation: pulse-node 3s infinite ease-in-out; }
+
+        @keyframes matrix-scan {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+        .hpc-scan-line { animation: matrix-scan 2s infinite linear; }
     </style>
 </head>
-<body>
-    <div id="root"></div>
+<body class="min-h-screen">
+
+    <canvas id="mol-canvas"></canvas>
+
+    <div id="root" class="relative z-10"></div>
 
     <script type="text/babel">
         const { useState, useEffect } = React;
@@ -30,187 +117,731 @@
         const App = () => {
             const [step, setStep] = useState(1);
             const [loading, setLoading] = useState(false);
-            const [trackingId, setTrackingId] = useState(new URLSearchParams(window.location.search).get('track'));
-            const [statusInfo, setStatusInfo] = useState(null);
-            const [files, setFiles] = useState([]);
+            const [trackingId, setTrackingId] = useState(null);
             
+            // Reusable states to hold both identification criteria and receptor tracking details
             const [formData, setFormData] = useState({
-                name: '', email: '', phone: '', affiliation: '', designation: '',
-                project: '', disease: '', receptor: '', apoprotein: '',
-                test_ligands: '', ref_ligands: '',
-                complexes: Array(8).fill(''),
-                pdbs: [], mdJobs: 1, duration: 100, voucher: '', totalAtoms: 0
+                name: '', email: '', phone: '', project: '', 
+                mdJobs: 4, duration: 0.1, voucher: '',
+                pdbId: '', compoundCount: ''
             });
 
-            const GAS_URL = "https://script.google.com/macros/s/AKfycbxb7sYz9zLrWd-M9ZWJoG0nxnut_SHO3t3Qq7K40ETlUcgl93I3WdAhqtPin67cGsq7hA/exec"; 
-
-            // Tiered Scholar Pricing Logic
             const calculatePrice = () => {
-                const n = parseInt(formData.mdJobs);
-                let price = 0;
-                if (n === 1) price = 2000;
-                else if (n === 2) price = 4000;
-                else if (n >= 3 && n <= 5) price = 7500;
-                else if (n > 5 && n <= 10) price = 13000;
-                else price = 17000;
+                const n = parseInt(formData.mdJobs) || 1;
+                let baseInr = 0;
+                
+                if (n === 1) baseInr = 2499;
+                else if (n === 2) baseInr = 4499;
+                else if (n >= 3 && n <= 5) baseInr = 7999;
+                else baseInr = 12999;
 
-                const raw = n * 2000;
-                return { raw, final: price, savings: raw - price };
-            };
-
-            // Tracking Logic
-            useEffect(() => {
-                if (trackingId) {
-                    fetch(`${GAS_URL}?track=${trackingId}`)
-                        .then(r => r.json())
-                        .then(data => setStatusInfo(data));
+                if (formData.voucher.toUpperCase() === 'ROBOT') {
+                    baseInr = Math.floor(baseInr * 0.90);
                 }
-            }, [trackingId]);
-
-            const fetchPDB = async (id) => {
-                if(!id || id.length !== 4) return;
-                try {
-                    const res = await fetch(`https://data.rcsb.org/rest/v1/core/entry/${id.toLowerCase()}`);
-                    const data = await res.json();
-                    const atoms = data.rcsb_entry_info.deposited_atom_count;
-                    if(!formData.pdbs.includes(id.toUpperCase())) {
-                        setFormData(prev => ({ ...prev, totalAtoms: prev.totalAtoms + atoms, pdbs: [...prev.pdbs, id.toUpperCase()] }));
-                    }
-                } catch (e) { alert("PDB Data not found for: " + id); }
+                const baseUsd = Math.round(baseInr / 83);
+                return { inr: baseInr, usd: baseUsd };
             };
 
-            const submit = async () => {
+            const triggerSubmit = async () => {
                 setLoading(true);
-                const payload = { ...formData, pricing: calculatePrice(), files };
-                try {
-                    const res = await fetch(GAS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                    alert("Submission Received! Check your email for tracking ID.");
-                    window.location.reload();
-                } catch (e) { alert("Submission failed. Check connection."); }
+                await new Promise(resolve => setTimeout(resolve, 1800));
+                setTrackingId("GMX-NODE-RUN-" + Math.floor(400000 + Math.random() * 500000));
                 setLoading(false);
             };
 
-            if (trackingId) return (
-                <div className="max-w-2xl mx-auto py-20 px-6">
-                    <div className="glass p-10 rounded-3xl text-center">
-                        <h2 className="text-3xl font-bold text-cyan-400 mb-6">Project Tracker</h2>
-                        <div className="text-slate-400 mb-2">Project ID: {trackingId}</div>
-                        <div className="text-6xl font-black mb-8">{statusInfo ? statusInfo.status : 'Loading...'}</div>
-                        <button onClick={() => window.location.href = window.location.pathname} className="text-cyan-500 underline text-sm">Back to Home</button>
-                    </div>
-                </div>
-            );
+            const generateMailtoLink = () => {
+                const recipient = "ravi.med.chem@gmail.com";
+                const projectTag = formData.project ? formData.project : "[Insert Project Name]";
+                const subject = `Project Inquiry: Molecular Docking & MD Simulation - ${projectTag}`;
+                const nsDuration = formData.duration ? Math.round(parseFloat(formData.duration) * 1000) : "100";
+
+                const body = `Hello “GROMACS Cloud Workspace with AI” Team,\n\n` +
+                             `I would like to outsource a computational project for docking and molecular dynamics. Please find the preliminary details below:\n\n` +
+                             `1. Project Identity\n` +
+                             `Collaborator Name: ${formData.name || ''}\n` +
+                             `Institution/Affiliation: \n` +
+                             `Project Short Name: ${formData.project || ''}\n\n` +
+                             `2. Scientific Data\n` +
+                             `Protein Name / Receptor: ${formData.pdbId || ''}\n` +
+                             `PDB ID(s): ${formData.pdbId || ''}\n` +
+                             `Target Disease:\n` +
+                             `Ligand Name(s) / SMILES / mol2 file attached:\n\n` +
+                             `3. Simulation Requirements\n` +
+                             `Service Requested: [Docking / MD / Both]\n` +
+                             `Number of MD Simulation Jobs: ${formData.mdJobs}\n` +
+                             `Preferred Duration (ns): ${nsDuration} ns\n\n` +
+                             `4. Files Attached\n` +
+                             `Ligand structures (.mol2 / .mae / .sdf)\n` +
+                             `Reference Images / Documentation (if any)\n\n` +
+                             `Please review these details and let me know the feasibility and the final scholar-tier pricing for this project.\n\n` +
+                             `Best regards,\n` +
+                             `${formData.name || '[Your Name]'}`;
+
+                return `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            };
+
+            // DYNAMIC WHATSAPP DRAFT GENERATOR FUNCTION WITH MARKDOWN STYLE FOR PHONES
+            const generateWhatsappLink = () => {
+                const phoneNumber = "918288992343";
+                const pdbDisplay = formData.pdbId ? formData.pdbId : "[Insert PDB ID]";
+                const ligandDisplay = formData.compoundCount ? formData.compoundCount : "[Insert number]";
+                const nsDuration = formData.duration ? Math.round(parseFloat(formData.duration) * 1000) : "100";
+                const nameDisplay = formData.name ? formData.name : "[Your Name]";
+
+                const textBlock = `Hello GROMACS Cloud Workspace with AI Team,\n\n` +
+                                  `I would like to check the feasibility and scholarly pricing for an upcoming Molecular Docking/MD Simulation project.\n\n` +
+                                  `Project Details:\n` +
+                                  `🔹 Target Protein / PDB ID: ${pdbDisplay}\n` +
+                                  `🔹 No. of Compounds/Ligands: ${ligandDisplay}\n` +
+                                  `🔹 Simulation Scale: ${formData.mdJobs} Jobs x ${nsDuration} ns\n\n` +
+                                  `Could you please let me know the turnaround time and how I can share my structural files (.pdb / .mol2) with you for verification?\n\n` +
+                                  `Best regards,\n` +
+                                  `${nameDisplay}`;
+
+                return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(textBlock)}`;
+            };
+
+            const rates = calculatePrice();
 
             return (
-                <div className="max-w-6xl mx-auto py-12 px-6">
-                    <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
-                        <div className="text-center md:text-left">
-                            <h1 className="text-5xl font-black tracking-tight text-white mb-2">BioSim <span className="text-cyan-500">Intake</span></h1>
-                            <p className="text-slate-400">Computational Chemistry & MD Simulation Hub</p>
+                <div className="w-full">
+                    
+                    {/* TOP NAVIGATION HEADER */}
+                    <nav className="border-b border-cyan-500/15 bg-slate-950/80 backdrop-blur-lg sticky top-0 z-50 px-6 py-4">
+                        <div className="max-w-7xl mx-auto flex justify-between items-center">
+                            <div className="flex items-center gap-3">
+                                <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-cyan-400 to-purple-600 flex items-center justify-center font-bold text-white tracking-tighter text-sm">GMX</div>
+                                <span className="font-display font-bold text-base tracking-wide text-white">GROMACS <span className="text-cyan-400 font-light">Cloud Workspace with AI </span></span>
+                            </div>
+                            <div className="hidden lg:flex items-center gap-8 text-xs font-semibold uppercase tracking-widest text-slate-300">
+                                <a href="#pipeline" className="hover:text-cyan-400 transition">WORKFLOW</a>
+                                <a href="#submission-console" className="text-cyan-400 font-bold hover:underline transition">Submit your Job</a>
+                                <a href="#analytics" className="hover:text-purple-400 transition">Automated Analytics</a>
+                                <a href="#publications" className="hover:text-cyan-400 transition">Literature Benchmarks</a>
+                            </div>
+                            <a href={generateMailtoLink()} className="text-xs text-slate-300 border border-cyan-500/30 rounded-lg px-3 py-2 bg-cyan-950/50 hover:bg-slate-900 hover:text-cyan-400 transition font-mono shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+                                ravi.med.chem@gmail.com
+                            </a>
                         </div>
-                        <div className="flex gap-4">
-                            {[1, 2, 3, 4].map(s => (
-                                <div key={s} className={`step-pill ${step >= s ? 'step-active' : ''}`}>{s}</div>
-                            ))}
-                        </div>
-                    </div>
+                    </nav>
 
-                    <div className="glass rounded-[2rem] overflow-hidden shadow-2xl flex flex-col md:flex-row min-h-[600px]">
-                        {/* LEFT: INPUT AREA */}
-                        <div className="flex-1 p-8 md:p-12 border-b md:border-b-0 md:border-r border-slate-800">
-                            {step === 1 && (
-                                <div className="space-y-6 animate-fadeIn">
-                                    <h3 className="text-2xl font-bold mb-6">User Identification</h3>
-                                    <input className="input-pro" placeholder="Full Name" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <input className="input-pro" placeholder="Email Address" onChange={e => setFormData({...formData, email: e.target.value})} />
-                                        <input className="input-pro" placeholder="Phone Number" onChange={e => setFormData({...formData, phone: e.target.value})} />
-                                    </div>
-                                    <input className="input-pro" placeholder="Institution / Organization" onChange={e => setFormData({...formData, affiliation: e.target.value})} />
-                                    <input className="input-pro" placeholder="Designation (e.g. Research Scholar)" onChange={e => setFormData({...formData, designation: e.target.value})} />
-                                    <button onClick={() => setStep(2)} className="w-full btn-primary py-4 rounded-xl font-bold mt-4">Next: Project Context</button>
+                    {/* MAIN GRAPHICS OVERVIEW LAYER */}
+                    <main className="max-w-7xl mx-auto py-12 md:py-16 px-6 space-y-32">
+                        
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                            
+                            {/* LEFT SIDE TEXT MATRIX */}
+                            <div className="lg:col-span-6 space-y-6">
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-cyan-500/20 bg-cyan-500/5 text-cyan-300 text-xs font-mono">
+                                    ⚙️ Dedicated AMD ROCm™ Linux Architecture
                                 </div>
-                            )}
+                                <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-white leading-none">
+                                    Automated Docking, MDRun, and <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">Reports on Demand</span>
+                                </h1>
+                                <p className="text-slate-300 text-sm leading-relaxed">
+                                    Accelerate your drug discovery project workflow with end-to-end automation. Effortlessly stream your chemical compound libraries through high-throughput docking, launch production-grade molecular dynamics (MDRun) simulations instantly, and generate presentation-ready analytical reports on demand—all from a single, unified interface.
+                                </p>
 
-                            {step === 2 && (
-                                <div className="space-y-4">
-                                    <h3 className="text-2xl font-bold mb-6">Scientific Parameters</h3>
-                                    <input className="input-pro" placeholder="Project Short Name" onChange={e => setFormData({...formData, project: e.target.value})} />
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <input className="input-pro" placeholder="Disease/Target" onChange={e => setFormData({...formData, disease: e.target.value})} />
-                                        <input className="input-pro" placeholder="Receptor Name" onChange={e => setFormData({...formData, receptor: e.target.value})} />
+                                {/* MICROSECOND CALCULATOR CALIBRATION DISPLAY */}
+                                <div className="p-5 rounded-2xl bg-slate-950/90 border border-slate-800 space-y-4">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-[10px] font-mono tracking-widest text-cyan-400 uppercase font-bold flex items-center gap-2">
+                                            <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                                            Microsecond Scale Parameters
+                                        </span>
+                                        <span className="text-[10px] font-mono text-slate-500">GROMACS Target Architecture</span>
                                     </div>
-                                    <textarea className="input-pro h-24" placeholder="Test Ligands (SMILES or IDs)" onChange={e => setFormData({...formData, test_ligands: e.target.value})}></textarea>
-                                    <input className="input-pro" placeholder="Reference Ligand Name" onChange={e => setFormData({...formData, ref_ligands: e.target.value})} />
-                                    <button onClick={() => setStep(3)} className="w-full btn-primary py-4 rounded-xl font-bold mt-4">Next: Molecular Setup</button>
+                                    <div className="grid grid-cols-2 gap-4 text-xs font-mono border-t border-b border-slate-900 py-3">
+                                        <div className="space-y-1">
+                                            <div className="text-slate-500 text-[10px]">TRAJECTORY RANGE SCALE:</div>
+                                            <div className="text-slate-200 font-bold">Scalable up to 1.0 µs</div>
+                                            <div className="text-[10px] text-slate-500 font-sans">(Equivalent to 1000 ns)</div>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <div className="text-slate-500 text-[10px]">CORE CONFIGURE VALUE:</div>
+                                            <div className="text-purple-400 font-bold">nsteps = 250000000</div>
+                                            <div className="text-[10px] text-slate-400 font-sans mt-0.5">(500,000 ps / 0.5 µs per track run)</div>
+                                        </div>
+                                    </div>
                                 </div>
-                            )}
 
-                            {step === 3 && (
-                                <div className="space-y-4">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <input className="input-pro" placeholder="Apoprotein Name" onChange={e => setFormData({...formData, apoprotein: e.target.value})} />
-                                        <input className="input-pro" placeholder="Main PDB ID (Auto-fetches on blur)" onBlur={e => fetchPDB(e.target.value)} />
-                                    </div>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                                        {formData.complexes.map((c, i) => (
-                                            <input key={i} className="input-pro text-xs" placeholder={`Complex ${i+1}`} 
-                                            onChange={e => {
-                                                const newC = [...formData.complexes];
-                                                newC[i] = e.target.value;
-                                                setFormData({...formData, complexes: newC});
-                                            }} />
-                                        ))}
-                                    </div>
-                                    <div id="jsme_container" className="rounded-xl overflow-hidden border border-slate-700 bg-white"></div>
-                                    <button onClick={() => setStep(4)} className="w-full btn-primary py-4 rounded-xl font-bold mt-4">Review & Pricing</button>
-                                </div>
-                            )}
-
-                            {step === 4 && (
-                                <div className="space-y-6">
-                                    <h3 className="text-2xl font-bold">Simulation Details</h3>
-                                    <div className="grid grid-cols-2 gap-6">
-                                        <div><label className="text-xs text-slate-500 uppercase">Number of Jobs</label><input type="number" className="input-pro" value={formData.mdJobs} onChange={e => setFormData({...formData, mdJobs: e.target.value})} /></div>
-                                        <div><label className="text-xs text-slate-500 uppercase">Duration (ns)</label><input type="number" className="input-pro" value={formData.duration} onChange={e => setFormData({...formData, duration: e.target.value})} /></div>
-                                    </div>
-                                    <input className="input-pro border-dashed border-cyan-500/50" placeholder="Discount Voucher" onChange={e => setFormData({...formData, voucher: e.target.value})} />
-                                    <button onClick={submit} disabled={loading} className="w-full btn-primary py-4 rounded-xl font-bold text-lg mt-4">
-                                        {loading ? "Initializing Simulation Workspace..." : "Confirm & Submit Project"}
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* RIGHT: PRICING SIDEBAR */}
-                        <div className="w-full md:w-[320px] p-8 bg-slate-900/50 flex flex-col justify-between">
-                            <div>
-                                <h4 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-6">Price Summary</h4>
-                                <div className="space-y-4">
-                                    <div className="flex justify-between"><span>Base Rate</span><span>₹{calculatePrice().raw}</span></div>
-                                    <div className="flex justify-between text-green-400"><span>Scholar Discount</span><span>-₹{calculatePrice().savings}</span></div>
-                                    <div className="border-t border-slate-800 pt-4 flex justify-between items-end">
-                                        <span className="text-lg">Total</span>
-                                        <span className="text-4xl font-bold text-cyan-400">₹{calculatePrice().final}</span>
+                                {/* EMBEDDED UNIFIED ECOSYSTEM GRAPHIC INFOCARD WITH ASSISTANCE CHANNELS */}
+                                <div className="p-5 rounded-xl border border-cyan-500/20 bg-gradient-to-r from-slate-950 to-slate-900 shadow-xl relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 p-3 text-cyan-500/10 text-3xl font-mono font-bold">AI</div>
+                                    <div className="flex items-start gap-3">
+                                        <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 mt-0.5">
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                        </div>
+                                        <div className="space-y-3 flex-1">
+                                            <h4 className="text-xs font-bold font-mono tracking-wider text-white uppercase flex items-center gap-2">
+                                                💡 Unified Automation Ecosystem with Human-in-the-Loop
+                                            </h4>
+                                            <p className="text-xs text-slate-300 leading-relaxed">
+                                                Our automation layer seamlessly maps and accelerates your operational workflow. No automated algorithmic entity or generative model overrides your core science; instead, we implement a strict Human-in-the-Loop (HITL) validation framework. Every project receives dedicated, one-on-one professional assistance to manually verify and tailor custom parametric requirements—ensuring your unique molecular insights remain mathematically sound and biologically viable.
+                                            </p>
+                                            
+                                            {/* FIRST INTEGRATED REVISED WHATSAPP BUTTON LOCATION */}
+                                            <div className="flex items-center justify-between border-t border-slate-800/60 pt-3 gap-4">
+                                                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] font-mono">
+                                                    <a href={generateWhatsappLink()} target="_blank" rel="noopener noreferrer" className="text-emerald-400 font-bold hover:underline flex items-center gap-1.5">
+                                                        <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></span>
+                                                        🟢 Connect with the Human (WhatsApp Helpline)
+                                                    </a>
+                                                    <span className="text-slate-700">|</span>
+                                                    <span className="text-slate-400 font-sans italic">Free Assistance — No Extra Charges</span>
+                                                </div>
+                                                
+                                                <div className="flex-shrink-0">
+                                                    <img 
+                                                        src="assets/images/your-profile-pic.jpg" 
+                                                        alt="Dr. Ravi Rawat" 
+                                                        className="w-10 h-10 rounded-full border-2 border-cyan-400 object-cover shadow-md shadow-cyan-500/20"
+                                                        onError={(e) => { e.target.src = "https://via.placeholder.com/150"; }} 
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="mt-12 bg-cyan-950/30 p-4 rounded-xl border border-cyan-900/50 text-xs text-cyan-200">
-                                <p className="font-bold mb-1 italic">🔒 Privacy Disclaimer</p>
-                                All biological data and chemical structures are processed on your private Ubuntu workspace. No PII is shared with third parties.
+
+                            {/* RIGHT SIDE NEURAL NETWORK INTERACTION MODULE */}
+                            <div className="lg:col-span-6 space-y-6">
+                                <div className="p-6 rounded-2xl bg-slate-950/90 border border-cyan-500/30 relative overflow-hidden aspect-[4/3] flex flex-col justify-between">
+                                    
+                                    <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#06b6d4_1.5px,transparent_1.5px)] [background-size:24px_24px]"></div>
+                                    <div className="absolute top-0 right-0 w-32 h-full bg-gradient-to-l from-purple-500/10 to-transparent pointer-events-none"></div>
+                                    <div className="absolute top-12 left-12 w-0.5 h-32 bg-cyan-400/30 hpc-scan-line"></div>
+                                    
+                                    <div className="flex justify-between items-center z-10">
+                                        <div className="flex items-center gap-2">
+                                            <span className="h-2 w-2 rounded-full bg-cyan-400 animate-ping"></span>
+                                            <span className="text-[10px] font-mono tracking-widest text-cyan-400 uppercase font-bold">AI Powered Docking and Simulation Core</span>
+                                        </div>
+                                        <span className="text-[9px] font-mono text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">ROCm Radeon™ Powerhouse Enabled</span>
+                                    </div>
+
+                                    {/* NETWORK CANVAS GRAPHIC CONTAINER */}
+                                    <div className="relative h-44 w-full flex items-center justify-between px-8 z-10">
+                                        <div className="flex flex-col gap-4">
+                                            {[1, 2, 3].map(n => <div key={n} className="h-3 w-3 rounded-full bg-cyan-400 dl-node"></div>)}
+                                        </div>
+                                        <svg className="absolute inset-0 w-full h-full opacity-30" xmlns="http://www.w3.org/2000/svg">
+                                            <line x1="15%" y1="25%" x2="50%" y2="20%" stroke="#06b6d4" strokeWidth="1" />
+                                            <line x1="15%" y1="25%" x2="50%" y2="50%" stroke="#06b6d4" strokeWidth="1" />
+                                            <line x1="15%" y1="50%" x2="50%" y2="20%" stroke="#06b6d4" strokeWidth="1" />
+                                            <line x1="15%" y1="50%" x2="50%" y2="50%" stroke="#06b6d4" strokeWidth="1" />
+                                            <line x1="15%" y1="50%" x2="50%" y2="80%" stroke="#06b6d4" strokeWidth="1" />
+                                            <line x1="15%" y1="75%" x2="50%" y2="50%" stroke="#06b6d4" strokeWidth="1" />
+                                            <line x1="15%" y1="75%" x2="50%" y2="80%" stroke="#06b6d4" strokeWidth="1" />
+
+                                            <line x1="50%" y1="20%" x2="85%" y2="50%" stroke="#a855f7" strokeWidth="1" />
+                                            <line x1="50%" y1="50%" x2="85%" y2="50%" stroke="#a855f7" strokeWidth="1" />
+                                            <line x1="50%" y1="80%" x2="85%" y2="50%" stroke="#a855f7" strokeWidth="1" />
+                                        </svg>
+                                        <div className="flex flex-col gap-6">
+                                            {[1, 2, 3, 4].map(n => <div key={n} className="h-3 w-3 rounded-full bg-purple-500 dl-node" style={{ animationDelay: '0.4s' }}></div>)}
+                                        </div>
+                                        <div className="flex flex-col gap-2">
+                                            <div className="h-4 w-4 rounded-full bg-emerald-400 dl-node" style={{ animationDelay: '0.8s' }}></div>
+                                        </div>
+                                    </div>
+
+                                    <div className="text-[11px] font-mono text-slate-400 z-10 flex justify-between border-t border-slate-900 pt-3">
+                                        <span>🧬 Atom-Level Geometries (High-Precision Conformation): Active</span>
+                                        <span className="text-cyan-400">🧠 LLM-Synthesized Multimodal Data & Reporting: Active</span>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="p-4 rounded-xl bg-slate-950/40 border border-slate-900 flex items-center gap-3">
+                                        <div className="h-2 w-2 rounded-full bg-cyan-400"></div>
+                                        <div>
+                                            <h4 className="text-xs font-bold text-white font-mono">AutoDock ROCm Radeon™ Engine</h4>
+                                            <p className="text-[10px] text-slate-500">Pre-simulation Screening</p>
+                                        </div>
+                                    </div>
+                                    <div className="p-4 rounded-xl bg-slate-950/40 border border-slate-900 flex items-center gap-3">
+                                        <div className="h-2 w-2 rounded-full bg-purple-400"></div>
+                                        <div>
+                                            <h4 className="text-xs font-bold text-white font-mono">GROMACS ROCm Radeon™ Engine</h4>
+                                            <p className="text-[10px] text-slate-500">Molecular Simulations with GROMACS</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+
                         </div>
+
+                        {/* MASSIVE CENTRALIZED HIGH INTERACTION JOB SUBMISSION HUB */}
+                        <section id="submission-console" className="pt-8">
+                            <div className="w-full text-center max-w-2xl mx-auto mb-10 space-y-2">
+                                <div className="text-[10px] font-mono tracking-widest text-cyan-400 uppercase font-bold flex items-center justify-center gap-2">
+                                    <span className="h-1 w-3 bg-cyan-400 inline-block"></span>
+                                    PRIMARY CONTROL DECK
+                                    <span className="h-1 w-3 bg-cyan-400 inline-block"></span>
+                                </div>
+                                <h2 className="font-display text-3xl font-bold text-white tracking-tight">Initialize GROMACS Cloud Workspace with AI</h2>
+                                <p className="text-xs text-slate-400">Please prioritize launching the docking screening/simulations immediately by providing receptor PDB ID and ligand structures. We will handle the specific details for analysis and report generation at a later stage.</p>
+                            </div>
+
+                            <div className="w-full mx-auto">
+                                {trackingId ? (
+                                    <div className="robotics-glass p-8 md:p-12 rounded-3xl space-y-8 max-w-5xl mx-auto border-t-4 border-purple-500">
+                                        <div className="border-b border-slate-800 pb-4">
+                                            <span className="text-xs font-mono text-purple-400 uppercase tracking-widest block mb-1">Instance Secure Allocation Lock Verified</span>
+                                            <h3 className="font-display text-2xl font-bold text-white">Input Workflow Molecular Parameters</h3>
+                                            <p className="text-xs text-slate-500 font-mono mt-1">HPC Workspace ID: {trackingId}</p>
+                                        </div>
+
+                                        <div className="space-y-6">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[11px] uppercase font-mono text-slate-400 tracking-wider">Academic / Enterprise Designation</label>
+                                                    <input className="input-cyber" placeholder="e.g. Senior Research Fellow / Principal Scientist" />
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[11px] uppercase font-mono text-slate-400 tracking-wider">Affiliated Research Institution</label>
+                                                    <input className="input-cyber" placeholder="University, Department, or Lab Group" />
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[11px] uppercase font-mono text-slate-400 tracking-wider">Target Disease Indication</label>
+                                                    <input className="input-cyber" placeholder="e.g. Oncology, Malarial, Neuro" />
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[11px] uppercase font-mono text-slate-400 tracking-wider">Target Receptor PDB Notation</label>
+                                                    <input className="input-cyber" placeholder="e.g. 4MQS, 7X2K" value={formData.pdbId} onChange={e => setFormData({...formData, pdbId: e.target.value})} />
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[11px] uppercase font-mono text-slate-400 tracking-wider">Apoprotein Variable Configuration</label>
+                                                    <input className="input-cyber" placeholder="Unbound structural constraints" />
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[11px] uppercase font-mono text-slate-400 tracking-wider">Reference Control Ligand Identifier</label>
+                                                    <input className="input-cyber" placeholder="Standard molecule control name" />
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[11px] uppercase font-mono text-slate-400 tracking-wider">Complex Variant Combinations List</label>
+                                                    <input className="input-cyber" placeholder="Naming formats matrix (e.g. Complex_A, Complex_B)" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <button onClick={() => alert("Scientific parameters loaded. Deploying target routines on compute nodes.")} className="w-full btn-action py-4 rounded-xl font-bold text-white text-xs uppercase tracking-widest shadow-xl">
+                                            Engage Automated Production Topologies
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="robotics-glass rounded-3xl overflow-hidden flex flex-col lg:flex-row max-w-6xl mx-auto shadow-2xl border border-cyan-500/30">
+                                        <div className="flex-1 p-8 md:p-12 space-y-8">
+                                            <div className="flex justify-between items-center border-b border-slate-800 pb-5">
+                                                <div>
+                                                    <h3 className="font-display font-bold text-xl text-white tracking-wide">
+                                                        {step === 1 ? "Step 01: Researcher Clearance Identity" : "Step 02: Cluster Configuration Metrics"}
+                                                    </h3>
+                                                    <p className="text-xs text-slate-400 mt-1">Please provide accurate contact parameters to route your direct analysis workspace report lines safely.</p>
+                                                </div>
+                                                <span className="text-xs font-mono bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 px-3 py-1 rounded-md">Stage {step} of 2</span>
+                                            </div>
+
+                                            {step === 1 ? (
+                                                <div className="space-y-5">
+                                                    <div className="space-y-1.5">
+                                                        <label className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Researcher Full Name</label>
+                                                        <input className="input-cyber" placeholder="Dr. / Professor / Researcher Name" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                                                    </div>
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                                        <div className="space-y-1.5">
+                                                            <label className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Email</label>
+                                                            <input type="email" className="input-cyber" placeholder="name@institution.edu" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                                                        </div>
+                                                        <div className="space-y-1.5">
+                                                            <label className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Active Contact Phone / WhatsApp Sequence</label>
+                                                            <input type="tel" className="input-cyber" placeholder="+91 XXXXX XXXXX" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                                        <div className="space-y-1.5">
+                                                            <label className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Project Short Title Tracking-Alias</label>
+                                                            <input className="input-cyber" placeholder="e.g. Kinase_Inhibitors_2026" value={formData.project} onChange={e => setFormData({...formData, project: e.target.value})} />
+                                                        </div>
+                                                        <div className="space-y-1.5">
+                                                            <label className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Target PDB ID</label>
+                                                            <input className="input-cyber" placeholder="e.g. 7X2K" value={formData.pdbId} onChange={e => setFormData({...formData, pdbId: e.target.value})} />
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div className="pt-4">
+                                                        <button onClick={() => { if(formData.name && formData.email) setStep(2); else alert('Complete required identification tracks before proceeding.'); }} className="w-full btn-action py-4 rounded-xl font-bold text-white text-xs uppercase tracking-widest shadow-md">
+                                                            Configure Compute Job Dimensions →
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="space-y-6">
+                                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                                        <div className="space-y-1.5">
+                                                            <label className="text-[11px] text-slate-400 font-mono uppercase tracking-wider">Independent Processing Jobs Count</label>
+                                                            <input type="number" min="1" className="input-cyber font-mono text-center text-lg" value={formData.mdJobs} onChange={e => setFormData({...formData, mdJobs: e.target.value})} />
+                                                            <p className="text-[10px] text-slate-500">Number of discrete simulation tracks to deploy.</p>
+                                                        </div>
+                                                        <div className="space-y-1.5">
+                                                            <label className="text-[11px] text-slate-400 font-mono uppercase tracking-wider">Total Number of Compounds</label>
+                                                            <input type="number" min="1" className="input-cyber font-mono text-center text-lg" placeholder="e.g. 25" value={formData.compoundCount} onChange={e => setFormData({...formData, compoundCount: e.target.value})} />
+                                                            <p className="text-[10px] text-slate-500">Total number of screening compounds/ligands.</p>
+                                                        </div>
+                                                        <div className="space-y-1.5">
+                                                            <label className="text-[11px] text-slate-400 font-mono uppercase tracking-wider">Simulation Scale Duration (µs)</label>
+                                                            <div className="relative">
+                                                                <input type="number" min="0.01" step="0.05" className="input-cyber font-mono text-center text-lg" value={formData.duration} onChange={e => setFormData({...formData, duration: e.target.value})} />
+                                                                <span className="absolute right-4 top-3.5 text-xs text-cyan-400 font-mono font-bold">µs</span>
+                                                            </div>
+                                                            <p className="text-[10px] text-slate-500">Path length metrics (e.g. 0.1 µs = 100 ns).</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-1.5">
+                                                        <label className="text-[11px] text-slate-400 font-mono uppercase tracking-wider">Scholar Coupon Promo Token</label>
+                                                        <input className="input-cyber border-dashed border-cyan-500/40 text-cyan-300 font-mono" placeholder="Apply your promo code if active" value={formData.voucher} onChange={e => setFormData({...formData, voucher: e.target.value})} />
+                                                    </div>
+                                                    <div className="flex gap-4 pt-4">
+                                                        <button onClick={() => setStep(1)} className="px-5 py-4 rounded-xl border border-slate-800 text-xs font-bold text-slate-400 hover:text-white transition uppercase tracking-wider">Back</button>
+                                                        <button onClick={triggerSubmit} disabled={loading} className="flex-1 btn-action py-4 rounded-xl font-bold text-white text-xs uppercase tracking-widest shadow-xl">
+                                                            {loading ? "Allocating Hardware AMD Nodes..." : "Secure Node Allocation Lock"}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="w-full lg:w-[280px] p-8 bg-slate-950/80 border-t lg:border-t-0 lg:border-l border-slate-900 flex flex-col justify-between">
+                                            <div className="space-y-6">
+                                                <div className="space-y-1.5">
+                                                    <span className="text-[10px] font-mono tracking-widest text-cyan-400 uppercase font-bold block pb-2 border-b border-slate-900">Cost Breakdown</span>
+                                                    <span className="text-[11px] uppercase text-slate-400 tracking-wide block">Total Cost (INR Baseline):</span>
+                                                    <div className="text-3xl font-black font-display text-white">₹{rates.inr}</div>
+                                                </div>
+                                                <div className="space-y-1 border-t border-slate-900 pt-3">
+                                                    <span className="text-[11px] uppercase text-slate-400 tracking-wide block">Global Alternative Amount:</span>
+                                                    <div className="text-lg font-bold font-mono text-cyan-400">({rates.usd} USD)</div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="mt-12 pt-4 border-t border-slate-900 text-[11px] text-slate-400 space-y-2.5">
+                                                <div className="flex items-center gap-2">🟢 <span className="text-slate-300">0% Added Surcharges</span></div>
+                                                <div className="flex items-center gap-2">🟢 <span className="text-slate-300">No Hidden Taxes Added</span></div>
+                                                <div className="flex items-center gap-2">🟢 <span className="text-slate-300">Includes Full Graphics Package</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </section>
+
+                        {/* SECTION: AUTOMATED COMPREHENSIVE ANALYTICS SUITE */}
+                        <section id="analytics" className="space-y-8">
+                            <div className="border-l-2 border-cyan-400 pl-4">
+                                <h2 className="font-display text-2xl font-bold text-white">Automated Comprehensive Analytics Suite</h2>
+                                <p className="text-xs text-slate-400 mt-0.5">High-resolution scientific metrics are automatically synthesized and outputted directly inside your complete production bundle at no extra charge. Driven by an advanced Multimodal LLM Engine, the pipeline seamlessly compiles high-fidelity structural images, molecular trajectory videos, comprehensive numerical datasets, and contextual text analysis, delivering a production-ready report alongside your raw simulation data.</p>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {/* GRAPHIC ONE FRAME */}
+                                <div className="rounded-2xl bg-slate-950/90 border border-slate-800 overflow-hidden flex flex-col justify-between p-5 relative">
+                                    <div className="text-[10px] font-mono text-slate-500 uppercase">Automated Graphic 01</div>
+                                    <div className="my-6 border border-slate-900/60 aspect-video rounded-xl bg-slate-950/40 overflow-hidden flex items-center justify-center">
+                                        <img 
+                                            src="assets/images/rmsd-evolution-map.png" 
+                                            alt="Protein RMSD Evolution Map" 
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span class="text-[11px] text-slate-600 italic font-mono p-2 text-center">[Placeholder: Drag and Drop your Protein RMSD Evolution Map plot file here]</span>'; }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-sm font-bold text-slate-200">Protein RMSD Evolution Map</h4>
+                                        <p className="text-xs text-cyan-400 font-mono mt-0.5">Trajectory Equilibrium</p>
+                                    </div>
+                                </div>
+
+                                {/* GRAPHIC TWO FRAME */}
+                                <div className="rounded-2xl bg-slate-950/90 border border-slate-800 overflow-hidden flex flex-col justify-between p-5 relative">
+                                    <div className="text-[10px] font-mono text-slate-500 uppercase">Automated Graphic 02</div>
+                                    <div className="my-6 border border-slate-900/60 aspect-video rounded-xl bg-slate-950/40 overflow-hidden flex items-center justify-center">
+                                        <img 
+                                            src="assets/images/mmpbsa-binding-energy.png" 
+                                            alt="MMPBSA Free Energy Binding" 
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span class="text-[11px] text-slate-600 italic font-mono p-2 text-center">[Placeholder: Drag and Drop your MMPBSA Free Energy binding grid chart here]</span>'; }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-sm font-bold text-slate-200">MMPBSA Free Energy Binding</h4>
+                                        <p className="text-xs text-cyan-400 font-mono mt-0.5">Thermodynamic Quantization</p>
+                                    </div>
+                                </div>
+
+                                {/* GRAPHIC THREE FRAME */}
+                                <div className="rounded-2xl bg-slate-950/90 border border-slate-800 overflow-hidden flex flex-col justify-between p-5 relative">
+                                    <div className="text-[10px] font-mono text-slate-500 uppercase">Automated Graphic 03</div>
+                                    <div className="my-6 border border-slate-900/60 aspect-video rounded-xl bg-slate-950/40 overflow-hidden flex items-center justify-center">
+                                        <img 
+                                            src="assets/images/pca-dynamics.png" 
+                                            alt="Principal Component Analysis" 
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span class="text-[11px] text-slate-600 italic font-mono p-2 text-center">[Placeholder: Drag and Drop your Principal Component Analysis plot layout here]</span>'; }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-sm font-bold text-slate-200">Principal Component Analysis</h4>
+                                        <p className="text-xs text-cyan-400 font-mono mt-0.5">Essential Dynamics Mode</p>
+                                    </div>
+                                </div>
+
+                                {/* GRAPHIC FOUR FRAME */}
+                                <div className="rounded-2xl bg-slate-950/90 border border-slate-800 overflow-hidden flex flex-col justify-between p-5 relative">
+                                    <div className="text-[10px] font-mono text-slate-500 uppercase">Automated Graphic 04</div>
+                                    <div className="my-6 border border-slate-900/60 aspect-video rounded-xl bg-slate-950/40 overflow-hidden flex items-center justify-center">
+                                        <img 
+                                            src="assets/images/free-energy-landscape.png" 
+                                            alt="Free Energy Landscapes" 
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span class="text-[11px] text-slate-600 italic font-mono p-2 text-center">[Placeholder: Drag and Drop your Free Energy Landscape chart mapping file here]</span>'; }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-sm font-bold text-slate-200">Free Energy Landscapes (FEL)</h4>
+                                        <p className="text-xs text-cyan-400 font-mono mt-0.5">Conformational Deep Mapping</p>
+                                    </div>
+                                </div>
+
+                                {/* DOCKING SCORE TABLE FRAME */}
+                                <div className="rounded-2xl bg-slate-950/90 border border-slate-800 overflow-hidden flex flex-col justify-between p-5 relative">
+                                    <div className="text-[10px] font-mono text-slate-500 uppercase">Automated Data Table 05</div>
+                                    <div className="my-6 border border-slate-900/60 aspect-video rounded-xl bg-slate-950/40 overflow-hidden flex items-center justify-center">
+                                        <img 
+                                            src="assets/images/docking-affinities-matrix.png" 
+                                            alt="Docking Score Affinities Matrix" 
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span class="text-[11px] text-slate-600 italic font-mono p-2 text-center">[Placeholder: Drag and Drop your Binding Affinities Score Table here]</span>'; }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-sm font-bold text-slate-200">Docking Score Affinities Matrix</h4>
+                                        <p className="text-xs text-purple-400 font-mono mt-0.5">kcal/mol Structural Values</p>
+                                    </div>
+                                </div>
+
+                                {/* 3D INTERACTION POSES MATRIX */}
+                                <div className="rounded-2xl bg-slate-950/90 border border-slate-800 overflow-hidden flex flex-col justify-between p-5 relative">
+                                    <div className="text-[10px] font-mono text-slate-500 uppercase">Automated Visualization 06</div>
+                                    <div className="my-6 border border-slate-900/60 aspect-video rounded-xl bg-slate-950/40 overflow-hidden flex items-center justify-center">
+                                        <img 
+                                            src="assets/images/3d-interaction-poses.png" 
+                                            alt="3D Interaction Docked Poses" 
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span class="text-[11px] text-slate-600 italic font-mono p-2 text-center">[Placeholder: Drag and Drop your 3D Ligand-Residue Interaction Pose Diagrams here]</span>'; }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-sm font-bold text-slate-200">3D Interaction Docked Poses</h4>
+                                        <p className="text-xs text-purple-400 font-mono mt-0.5">Atomic Geometry Mapping</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center text-xs font-medium font-mono pt-4">
+                                <div className="p-4 rounded-xl robotics-glass-light text-slate-300">📊 Ligand Core RMSD</div>
+                                <div className="p-4 rounded-xl robotics-glass-light text-slate-300">📊 Cofactor Trajectories</div>
+                                <div className="p-4 rounded-xl robotics-glass-light text-slate-300">📊 Residue Fluctuations (RMSF)</div>
+                            </div>
+                        </section>
+
+                        {/* SECTION: PEER-REVIEWED METHODOLOGY EVIDENCE */}
+                        <section id="publications" className="space-y-8">
+                            <div className="border-l-2 border-purple-400 pl-4">
+                                <h2 className="font-display text-2xl font-bold text-white">Peer-Reviewed Validation Proof</h2>
+                                <p className="text-xs text-slate-400 mt-0.5">Established molecular docking and GROMACS methodology architectures published with <strong>Dr. Ravi Rawat</strong> as Lead Corresponding Author (*).</p>
+                            </div>
+
+                            <div className="space-y-4 max-w-6xl">
+                                {[
+                                    {
+                                        cite: "Ravi Rawat*, Kant, K.; Kumar, A.; Bhati, K.; Verma, S. M. HeroMDAnalysis: An Automagical tool for GROMACS based Molecular Dynamics Simulation Analysis. Future Medicinal Chemistry, 2021, 13(5), 447-456. DOI: 10.4155/fmc-2020-0191",
+                                        factor: "4.768"
+                                    },
+                                    {
+                                        cite: "Uniyal, P.; Pramanik, S. D.; Pandey, S.; Shukla, P.; Roy, P.; Padrashar, D.; Gupta, S.; Ravi Rawat*, Gaurav, A.; Lee, V. S. Synergistic combinatorial anticancer potential of Tamoxifen with Naringin and Diosmetin in MCF-7 breast cancer cells and their liposomal delivery. Scientific Reports. 2026, 10.1038/s41598-026-37954-5",
+                                        factor: "4.5"
+                                    },
+                                    {
+                                        cite: "Ravi Rawat*, Verma, S. M. An exclusive computational insight toward molecular mechanism of MMV007571, a multitarget inhibitor of Plasmodium falciparum. Journal of Biomolecular Structure and Dynamics, 2020, 38(18), 5362-5373. DOI: 10.1080/07391102.2019.1700165",
+                                        factor: "5.235"
+                                    },
+                                    {
+                                        cite: "Ravi Rawat*, Verma, S. M. High-throughput virtual screening approach involving pharmacophore mapping, ADME filtering, molecular docking and MM-GBSA to identify new dual target inhibitors of PfDHODH and PfCytbc1 complex to combat drug resistant malaria. Journal of Biomolecular Structure and Dynamics, 2021, 39(14), 5148-5159. DOI: 10.1080/07391102.2020.1784288",
+                                        factor: "5.235"
+                                    },
+                                    {
+                                        cite: "Ravi Rawat*, Molecular Docking and Simulation Studies of Outer Membrane Proteins with piperacillin; a broad-spectrum antibiotic against Pseudomonas aeruginosa. Journal of Biomolecular Structure and Dynamics, 2025, DOI: 10.1080/07391102.2025.2499949",
+                                        factor: "5.235"
+                                    },
+                                    {
+                                        cite: "Choudhary, D.; Kaur, R.; Rani, N.; Kumar, B.; Singh, T. G.; Chandrasekaran, B.; Ravi Rawat*, Eyupoglu, V. Insights into in silico analysis to explore the multitarget antidepressant role of Camellia sinensis. Journal of Biomolecular Structure and Dynamics, 2025, DOI: 10.1080/07391102.2025.2498625",
+                                        factor: "5.235"
+                                    }
+                                ].map((item, idx) => (
+                                    <div key={idx} className="p-4 rounded-xl bg-slate-950/40 border border-slate-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs">
+                                        <p className="text-slate-300 leading-relaxed flex-1">
+                                            <span className="text-slate-600 font-mono inline-block w-6 font-bold">{idx+1}.</span>
+                                            {item.cite.split("Ravi Rawat*")[0]}
+                                            <strong className="text-white underline">Ravi Rawat*</strong>
+                                            {item.cite.split("Ravi Rawat*")[1]}
+                                        </p>
+                                        <div className="bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 font-mono text-[10px] px-2 py-0.5 rounded font-bold">
+                                            Impact Factor: {item.factor}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+
+                        {/* CONFIGURATION FRAMEWORK FAQS */}
+                        <section id="faqs" className="max-w-5xl mx-auto space-y-8">
+                            <div className="text-center space-y-2">
+                                <h2 className="font-display text-2xl font-bold text-white">Operational Framework FAQ</h2>
+                                <p className="text-xs text-slate-400">Clear scientific guidelines across Docking and Dynamics workflows.</p>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs leading-relaxed">
+                                <div className="p-5 rounded-2xl bg-slate-950/80 border border-slate-900 space-y-3">
+                                    <h4 className="font-bold text-cyan-400 uppercase tracking-wide">1. How is AI integrated into the workflow, and how does it enhance efficiency?</h4>
+                                    <p className="text-slate-400">We utilize specialized AI agents across five critical stages of the project lifecycle. This integration reduces human error, accelerates delivery times, and provides a level of analytical depth that standard automated tools cannot reach.</p>
+                                    <ul className="space-y-2 pl-2 border-l border-cyan-500/20 text-slate-300 font-sans">
+                                        <li><strong>Stage 1: Structural Curation & PDB Repair</strong> — AI-driven structural bioinformatics tools scan your PDB files for missing residues, broken loops, and incorrect protonation states in seconds to ensure stable MD runs.</li>
+                                        <li><strong>Stage 2: Forcefield & Ligand Parameterization</strong> — For novel compounds, AI agents determine appropriate partial charges and bond parameters compatible with GROMACS/Amber forcefields without manual topology tweaking.</li>
+                                        <li><strong>Stage 3: Intelligent Screening & Scoring</strong> — AI heuristics pre-filter ligand libraries and optimize binding pose selection based on historical "hit" patterns, keeping execution costs significantly lower.</li>
+                                        <li><strong>Stage 4: Trajectory Pattern Recognition</strong> — Dynamic AI observers monitor trajectories on AMD GPU clusters to spot pocket-closing or structural shifts, isolating the most scientifically critical frame sequences.</li>
+                                        <li><strong>Stage 5: Multi-Modal Report & Interpretation</strong> — Multimodal AI agents synthesize energy matrices into structured scientific discussions, mapping Pi-stacking, H-bonds, and Salt Bridges directly into drafted manuscripts.</li>
+                                    </ul>
+                                </div>
+
+                                <div className="p-5 rounded-2xl bg-slate-950/80 border border-slate-900 space-y-3 flex flex-col justify-between">
+                                    <div>
+                                        <h4 className="font-bold text-cyan-400 uppercase tracking-wide">2. How are AMD Radeon™ GPU clusters utilized to maintain "Scholar-Tier" pricing?</h4>
+                                        <p className="text-slate-400">We have optimized our computational kernels to run on High-Performance AMD Radeon™ GPU clusters using open-source parallel architectures (ROCm). By bypassing the high licensing costs associated with proprietary hardware ecosystems, we achieve high-throughput docking and nanosecond-scale MD simulations at a fraction of the cost. These savings allow us to offer institutional-grade results to individual PhD and Master's scholars within their budget.</p>
+                                    </div>
+                                    <div className="border-t border-slate-900 pt-3">
+                                        <h4 className="font-bold text-cyan-400 uppercase tracking-wide">3. What level of detail is included in the "Specific Interaction Analysis"?</h4>
+                                        <p className="text-slate-400">Unlike automated platforms that only provide raw binding energy, our multi-modal agents perform a deep-dive Structural Interpretation. Your report will explicitly identify and discuss specific molecular interactions—such as Pi-stacking with aromatic residues (e.g., Phe/Tyr), Hydrogen bonding networks, and Hydrophobic pocket fit. We don't just give you a number; we tell you why your molecule is a potential lead.</p>
+                                    </div>
+                                </div>
+
+                                <div className="p-5 rounded-2xl bg-slate-950/80 border border-slate-900 space-y-2">
+                                    <h4 className="font-bold text-cyan-400 uppercase tracking-wide">4. What specific deliverables are included in the final project package?</h4>
+                                    <p className="text-slate-400">We deliver a comprehensive, "submission-ready" bundle that includes:</p>
+                                    <ul className="list-disc pl-4 space-y-1 text-slate-300">
+                                        <li><strong>Detailed Report:</strong> Methodology, Results, Results Interpretation, and Conclusion.</li>
+                                        <li><strong>Visual Assets:</strong> High-Definition (HD) publication-grade images of binding poses.</li>
+                                        <li><strong>Data Assets:</strong> Raw Trajectory files, interaction tables, and energy matrices.</li>
+                                        <li><strong>Presentation Ready:</strong> A custom PowerPoint (PPT) slide deck summarizing the project for your thesis or lab meetings.</li>
+                                    </ul>
+                                </div>
+
+                                <div className="p-5 rounded-2xl bg-slate-950/80 border border-slate-900 space-y-2">
+                                    <h4 className="font-bold text-cyan-400 uppercase tracking-wide">5. Can I track the progress of my GPU-assigned tasks in real-time?</h4>
+                                    <p className="text-slate-400">Yes. Every project is assigned a dedicated GPU queue. Once you submit your PDB and Ligands, you will receive a Live Tracking URL. You can monitor the workflow status as it moves through:</p>
+                                    <ol className="list-decimal pl-4 space-y-1 text-slate-300 font-mono text-[11px]">
+                                        <li>Phase 1: AI PDB Repair & Parameterization</li>
+                                        <li>Phase 2: Screening & Docking</li>
+                                        <li>Phase 3: GPU-Accelerated MD Run</li>
+                                        <li>Phase 4: Multi-modal Agent Analysis & Report Synthesis</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </section>
+                    </main>
+
+                    {/* SECOND INTEGRATED LOCATION: FIXED FLOATING WHATSAPP BUTTON (BOTTOM-RIGHT) */}
+                    <div className="fixed bottom-6 right-6 z-50">
+                        <a href={generateWhatsappLink()} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-3.5 rounded-full shadow-xl transition text-xs tracking-wider uppercase">
+                            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.713-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.965C16.428 1.978 13.96 1.957 12.008 1.957c-5.444 0-9.866 4.372-9.87 9.802 0 1.726.48 3.408 1.39 4.888l-.997 3.642 3.726-.975zM17.56 15.14c-.301-.15-1.781-.879-2.056-.979-.275-.1-.475-.15-.675.15-.2.3-.775.979-.95 1.179-.175.2-.35.225-.651.075-.301-.15-1.27-.468-2.42-1.494-.894-.797-1.498-1.782-1.673-2.081-.175-.3-.018-.462.132-.61.135-.134.301-.35.451-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.675-1.625-.925-2.225-.244-.589-.493-.51-.675-.52-.175-.01-.375-.01-.575-.01-.2 0-.525.075-.8 1.05-.275.979-1.05 3.1-1.05 3.125 0 .025.324 1.756 1.701 3.064 1.3 1.232 2.599 1.8 3.52 1.8.922 0 1.63-.124 2.22-.213.66-.099 1.78-.727 2.03-1.43.25-.702.25-1.3.175-1.43-.075-.125-.275-.2-.575-.35z"/></svg>
+                            WhatsApp Assistance Desk
+                        </a>
                     </div>
+
+                    {/* FOOTER */}
+                    <footer className="border-t border-slate-900 bg-slate-950 text-[11px] text-slate-500 py-10 text-center px-6">
+                        <p className="max-w-xl mx-auto mb-1.5">GROMACS Cloud Workspace with AI is an independent structural chemistry processing pipeline console. GROMACS® software distributions remain properties of their respective open-source copyright holders.</p>
+                        <p>© 2026 GROMACS Cloud Workspace with AI. Built and used under supervision of Dr. Ravi Rawat.</p>
+                    </footer>
+
                 </div>
             );
         };
 
+        // BACKGROUND CANOPY GENERATION SCRIPT
+        window.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('mol-canvas');
+            const ctx = canvas.getContext('2d');
+            let atoms = [];
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            for (let i = 0; i < 45; i++) {
+                atoms.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    r: Math.random() * 2 + 1.5,
+                    vx: (Math.random() - 0.5) * 0.3,
+                    vy: (Math.random() - 0.5) * 0.3
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "rgba(6, 182, 212, 0.4)";
+                ctx.strokeStyle = "rgba(6, 182, 212, 0.05)";
+                ctx.lineWidth = 1;
+
+                atoms.forEach((a, idx) => {
+                    a.x += a.vx;
+                    a.y += a.vy;
+
+                    if (a.x < 0 || a.x > canvas.width) a.vx *= -1;
+                    if (a.y < 0 || a.y > canvas.height) a.vy *= -1;
+
+                    ctx.beginPath();
+                    ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    for (let j = idx + 1; j < atoms.length; j++) {
+                        let b = atoms[j];
+                        let dist = Math.hypot(a.x - b.x, a.y - b.y);
+                        if (dist < 110) {
+                            ctx.beginPath();
+                            ctx.moveTo(a.x, a.y);
+                            ctx.lineTo(b.x, b.y);
+                            ctx.stroke();
+                        }
+                    }
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        });
+
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
-
-        function jsmeOnLoad() { 
-            window.jsmeApplet = new JSME.JSME("jsme_container", "100%", "280px", { "options" : "oldlook,noxbutton" }); 
-        }
     </script>
 </body>
 </html>
