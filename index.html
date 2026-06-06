@@ -11,8 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #02050e; 
+            font-family: 'Plus Jakarta Sans', sans-serif; \n            background-color: #02050e; 
             color: #f1f5f9; 
             overflow-x: hidden;
         }
@@ -293,7 +292,7 @@
                                                 
                                                 <div className="flex-shrink-0">
                                                     <img 
-                                                        src="assets/images/your-profile-pic.jpg" 
+                                                        src="assets/images/thumbs/your-profile-pic.webp" 
                                                         alt="Dr. Ravi Rawat" 
                                                         className="w-10 h-10 rounded-full border-2 border-cyan-400 object-cover shadow-md shadow-cyan-500/20"
                                                         onError={(e) => { e.target.src = "https://via.placeholder.com/150"; }} 
@@ -476,7 +475,6 @@
                                                             <input className="input-cyber" placeholder="e.g. 7X2K" value={formData.pdbId} onChange={e => setFormData({...formData, pdbId: e.target.value})} />
                                                         </div>
                                                     </div>
-                                                    
                                                     <div className="pt-4">
                                                         <button onClick={() => { if(formData.name && formData.email) setStep(2); else alert('Complete required identification tracks before proceeding.'); }} className="w-full btn-action py-4 rounded-xl font-bold text-white text-xs uppercase tracking-widest shadow-md">
                                                             Configure Compute Job Dimensions →
@@ -505,37 +503,52 @@
                                                             <p className="text-[10px] text-slate-500">Path length metrics (e.g. 0.1 µs = 100 ns).</p>
                                                         </div>
                                                     </div>
+                                                    
                                                     <div className="space-y-1.5">
-                                                        <label className="text-[11px] text-slate-400 font-mono uppercase tracking-wider">Scholar Coupon Promo Token</label>
-                                                        <input className="input-cyber border-dashed border-cyan-500/40 text-cyan-300 font-mono" placeholder="Apply your promo code if active" value={formData.voucher} onChange={e => setFormData({...formData, voucher: e.target.value})} />
+                                                        <label className="text-[11px] text-slate-400 font-mono uppercase tracking-wider">Promo Coupon Authentication Route</label>
+                                                        <input className="input-cyber font-mono uppercase tracking-widest" placeholder="Enter voucher token if applicable" value={formData.voucher} onChange={e => setFormData({...formData, voucher: e.target.value})} />
                                                     </div>
-                                                    <div className="flex gap-4 pt-4">
-                                                        <button onClick={() => setStep(1)} className="px-5 py-4 rounded-xl border border-slate-800 text-xs font-bold text-slate-400 hover:text-white transition uppercase tracking-wider">Back</button>
-                                                        <button onClick={triggerSubmit} disabled={loading} className="flex-1 btn-action py-4 rounded-xl font-bold text-white text-xs uppercase tracking-widest shadow-xl">
-                                                            {loading ? "Allocating Hardware AMD Nodes..." : "Secure Node Allocation Lock"}
+
+                                                    <div className="pt-4 flex flex-col sm:flex-row gap-4">
+                                                        <button onClick={() => setStep(1)} className="border border-slate-800 text-slate-400 px-6 py-4 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-slate-900/60 transition">
+                                                            ← Return
+                                                        </button>
+                                                        <button onClick={triggerSubmit} className="flex-1 btn-action py-4 rounded-xl font-bold text-white text-xs uppercase tracking-widest shadow-lg">
+                                                            {loading ? "Allocating Node Resources..." : `Deploy Active Cluster Engine Instance (~$${rates.usd} USD)`}
                                                         </button>
                                                     </div>
                                                 </div>
                                             )}
                                         </div>
 
-                                        <div className="w-full lg:w-[280px] p-8 bg-slate-950/80 border-t lg:border-t-0 lg:border-l border-slate-900 flex flex-col justify-between">
+                                        <div className="w-full lg:w-80 bg-slate-950/60 border-t lg:border-t-0 lg:border-l border-slate-900 p-8 md:p-12 lg:p-8 flex flex-col justify-between space-y-8">
                                             <div className="space-y-6">
-                                                <div className="space-y-1.5">
-                                                    <span className="text-[10px] font-mono tracking-widest text-cyan-400 uppercase font-bold block pb-2 border-b border-slate-900">Cost Breakdown</span>
-                                                    <span className="text-[11px] uppercase text-slate-400 tracking-wide block">Total Cost (INR Baseline):</span>
-                                                    <div className="text-3xl font-black font-display text-white">₹{rates.inr}</div>
-                                                </div>
-                                                <div className="space-y-1 border-t border-slate-900 pt-3">
-                                                    <span className="text-[11px] uppercase text-slate-400 tracking-wide block">Global Alternative Amount:</span>
-                                                    <div className="text-lg font-bold font-mono text-cyan-400">({rates.usd} USD)</div>
+                                                <h4 className="text-[10px] font-mono tracking-widest text-slate-500 uppercase font-bold">Operational Invoice Metrics</h4>
+                                                <div className="space-y-4">
+                                                    <div className="flex justify-between items-baseline">
+                                                        <span className="text-xs text-slate-400">Total Workspace Nodes</span>
+                                                        <span className="text-sm font-mono text-slate-200">{formData.mdJobs || 0} Runs</span>
+                                                    </div>
+                                                    <div className="flex justify-between items-baseline">
+                                                        <span className="text-xs text-slate-400">Trajectory Path Sum</span>
+                                                        <span className="text-sm font-mono text-cyan-400 font-bold">{formData.duration ? Math.round(parseFloat(formData.duration) * 1000) : 0} ns</span>
+                                                    </div>
+                                                    <div className="flex justify-between items-baseline">
+                                                        <span className="text-xs text-slate-400">Voucher Status Check</span>
+                                                        <span className="text-[11px] font-mono text-purple-400">{formData.voucher.toUpperCase() === 'ROBOT' ? '10% ROBOT Active' : 'None Registered'}</span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            
-                                            <div className="mt-12 pt-4 border-t border-slate-900 text-[11px] text-slate-400 space-y-2.5">
-                                                <div className="flex items-center gap-2">🟢 <span className="text-slate-300">0% Added Surcharges</span></div>
-                                                <div className="flex items-center gap-2">🟢 <span className="text-slate-300">No Hidden Taxes Added</span></div>
-                                                <div className="flex items-center gap-2">🟢 <span className="text-slate-300">Includes Full Graphics Package</span></div>
+
+                                            <div className="border-t border-slate-900 pt-6 space-y-2">
+                                                <div className="flex justify-between items-baseline">
+                                                    <span className="text-xs font-bold text-white">Estimated Scholar Price:</span>
+                                                    <div className="text-right">
+                                                        <div className="text-2xl font-mono font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">₹{rates.inr}</div>
+                                                        <div className="text-[10px] text-slate-500 font-mono">~ ${rates.usd} USD</div>
+                                                    </div>
+                                                </div>
+                                                <p className="text-[10px] text-slate-500 leading-normal pt-1">Scholar-tier pricing is curated exclusively for university laboratories, PhD fellows, and academic publications.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -547,20 +560,27 @@
                         <section id="analytics" className="space-y-8">
                             <div className="border-l-2 border-cyan-400 pl-4">
                                 <h2 className="font-display text-2xl font-bold text-white">Automated Comprehensive Analytics Suite</h2>
-                                <p className="text-xs text-slate-400 mt-0.5">High-resolution scientific metrics are automatically synthesized and outputted directly inside your complete production bundle at no extra charge. Driven by an advanced Multimodal LLM Engine, the pipeline seamlessly compiles high-fidelity structural images, molecular trajectory videos, comprehensive numerical datasets, and contextual text analysis, delivering a production-ready report alongside your raw simulation data.</p>
+                                <p className="text-xs text-slate-400 mt-0.5">High-resolution scientific metrics are automatically synthesized and outputted directly inside your complete production bundle at no extra charge. Click any preview card to inspect the uncompressed, original publication-grade chart in a new tab.</p>
                             </div>
                             
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                
                                 {/* GRAPHIC ONE FRAME */}
                                 <div className="rounded-2xl bg-slate-950/90 border border-slate-800 overflow-hidden flex flex-col justify-between p-5 relative">
-                                    <div className="text-[10px] font-mono text-slate-500 uppercase">Automated Graphic 01</div>
-                                    <div className="my-6 border border-slate-900/60 aspect-video rounded-xl bg-slate-950/40 overflow-hidden flex items-center justify-center">
-                                        <img 
-                                            src="assets/images/rmsd-evolution-map.png" 
-                                            alt="Protein RMSD Evolution Map" 
-                                            className="w-full h-full object-cover"
-                                            onError={(e) => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span class="text-[11px] text-slate-600 italic font-mono p-2 text-center">[Placeholder: Drag and Drop your Protein RMSD Evolution Map plot file here]</span>'; }}
-                                        />
+                                    <div className="text-[10px] font-mono text-slate-500 uppercase flex justify-between">
+                                        <span>Automated Graphic 01</span>
+                                        <span className="text-cyan-500 text-[9px]">🔍 Click to zoom</span>
+                                    </div>
+                                    <div className="my-6 border border-slate-900/60 aspect-video rounded-xl bg-slate-950/40 overflow-hidden">
+                                        <a href="assets/images/originals/rmsd-evolution-map.png" target="_blank" rel="noopener noreferrer" className="cursor-zoom-in block w-full h-full">
+                                            <img 
+                                                src="assets/images/thumbs/rmsd-evolution-map.webp" 
+                                                alt="Protein RMSD Evolution Map" 
+                                                loading="lazy"
+                                                className="w-full h-full object-cover transition duration-300 hover:scale-105"
+                                                onError={(e) => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span class="text-[11px] text-slate-600 italic font-mono p-2 text-center flex h-full items-center justify-center">[Missing Image File]</span>'; }}
+                                            />
+                                        </a>
                                     </div>
                                     <div>
                                         <h4 className="text-sm font-bold text-slate-200">Protein RMSD Evolution Map</h4>
@@ -570,14 +590,20 @@
 
                                 {/* GRAPHIC TWO FRAME */}
                                 <div className="rounded-2xl bg-slate-950/90 border border-slate-800 overflow-hidden flex flex-col justify-between p-5 relative">
-                                    <div className="text-[10px] font-mono text-slate-500 uppercase">Automated Graphic 02</div>
-                                    <div className="my-6 border border-slate-900/60 aspect-video rounded-xl bg-slate-950/40 overflow-hidden flex items-center justify-center">
-                                        <img 
-                                            src="assets/images/mmpbsa-binding-energy.png" 
-                                            alt="MMPBSA Free Energy Binding" 
-                                            className="w-full h-full object-cover"
-                                            onError={(e) => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span class="text-[11px] text-slate-600 italic font-mono p-2 text-center">[Placeholder: Drag and Drop your MMPBSA Free Energy binding grid chart here]</span>'; }}
-                                        />
+                                    <div className="text-[10px] font-mono text-slate-500 uppercase flex justify-between">
+                                        <span>Automated Graphic 02</span>
+                                        <span className="text-cyan-500 text-[9px]">🔍 Click to zoom</span>
+                                    </div>
+                                    <div className="my-6 border border-slate-900/60 aspect-video rounded-xl bg-slate-950/40 overflow-hidden">
+                                        <a href="assets/images/originals/mmpbsa-binding-energy.png" target="_blank" rel="noopener noreferrer" className="cursor-zoom-in block w-full h-full">
+                                            <img 
+                                                src="assets/images/thumbs/mmpbsa-binding-energy.webp" 
+                                                alt="MMPBSA Free Energy Binding" 
+                                                loading="lazy"
+                                                className="w-full h-full object-cover transition duration-300 hover:scale-105"
+                                                onError={(e) => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span class="text-[11px] text-slate-600 italic font-mono p-2 text-center flex h-full items-center justify-center">[Missing Image File]</span>'; }}
+                                            />
+                                        </a>
                                     </div>
                                     <div>
                                         <h4 className="text-sm font-bold text-slate-200">MMPBSA Free Energy Binding</h4>
@@ -587,14 +613,20 @@
 
                                 {/* GRAPHIC THREE FRAME */}
                                 <div className="rounded-2xl bg-slate-950/90 border border-slate-800 overflow-hidden flex flex-col justify-between p-5 relative">
-                                    <div className="text-[10px] font-mono text-slate-500 uppercase">Automated Graphic 03</div>
-                                    <div className="my-6 border border-slate-900/60 aspect-video rounded-xl bg-slate-950/40 overflow-hidden flex items-center justify-center">
-                                        <img 
-                                            src="assets/images/pca-dynamics.png" 
-                                            alt="Principal Component Analysis" 
-                                            className="w-full h-full object-cover"
-                                            onError={(e) => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span class="text-[11px] text-slate-600 italic font-mono p-2 text-center">[Placeholder: Drag and Drop your Principal Component Analysis plot layout here]</span>'; }}
-                                        />
+                                    <div className="text-[10px] font-mono text-slate-500 uppercase flex justify-between">
+                                        <span>Automated Graphic 03</span>
+                                        <span className="text-cyan-500 text-[9px]">🔍 Click to zoom</span>
+                                    </div>
+                                    <div className="my-6 border border-slate-900/60 aspect-video rounded-xl bg-slate-950/40 overflow-hidden">
+                                        <a href="assets/images/originals/pca-dynamics.png" target="_blank" rel="noopener noreferrer" className="cursor-zoom-in block w-full h-full">
+                                            <img 
+                                                src="assets/images/thumbs/pca-dynamics.webp" 
+                                                alt="Principal Component Analysis" 
+                                                loading="lazy"
+                                                className="w-full h-full object-cover transition duration-300 hover:scale-105"
+                                                onError={(e) => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span class="text-[11px] text-slate-600 italic font-mono p-2 text-center flex h-full items-center justify-center">[Missing Image File]</span>'; }}
+                                            />
+                                        </a>
                                     </div>
                                     <div>
                                         <h4 className="text-sm font-bold text-slate-200">Principal Component Analysis</h4>
@@ -604,14 +636,20 @@
 
                                 {/* GRAPHIC FOUR FRAME */}
                                 <div className="rounded-2xl bg-slate-950/90 border border-slate-800 overflow-hidden flex flex-col justify-between p-5 relative">
-                                    <div className="text-[10px] font-mono text-slate-500 uppercase">Automated Graphic 04</div>
-                                    <div className="my-6 border border-slate-900/60 aspect-video rounded-xl bg-slate-950/40 overflow-hidden flex items-center justify-center">
-                                        <img 
-                                            src="assets/images/free-energy-landscape.png" 
-                                            alt="Free Energy Landscapes" 
-                                            className="w-full h-full object-cover"
-                                            onError={(e) => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span class="text-[11px] text-slate-600 italic font-mono p-2 text-center">[Placeholder: Drag and Drop your Free Energy Landscape chart mapping file here]</span>'; }}
-                                        />
+                                    <div className="text-[10px] font-mono text-slate-500 uppercase flex justify-between">
+                                        <span>Automated Graphic 04</span>
+                                        <span className="text-cyan-500 text-[9px]">🔍 Click to zoom</span>
+                                    </div>
+                                    <div className="my-6 border border-slate-900/60 aspect-video rounded-xl bg-slate-950/40 overflow-hidden">
+                                        <a href="assets/images/originals/free-energy-landscape.png" target="_blank" rel="noopener noreferrer" className="cursor-zoom-in block w-full h-full">
+                                            <img 
+                                                src="assets/images/thumbs/free-energy-landscape.webp" 
+                                                alt="Free Energy Landscapes" 
+                                                loading="lazy"
+                                                className="w-full h-full object-cover transition duration-300 hover:scale-105"
+                                                onError={(e) => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span class="text-[11px] text-slate-600 italic font-mono p-2 text-center flex h-full items-center justify-center">[Missing Image File]</span>'; }}
+                                            />
+                                        </a>
                                     </div>
                                     <div>
                                         <h4 className="text-sm font-bold text-slate-200">Free Energy Landscapes (FEL)</h4>
@@ -621,14 +659,20 @@
 
                                 {/* DOCKING SCORE TABLE FRAME */}
                                 <div className="rounded-2xl bg-slate-950/90 border border-slate-800 overflow-hidden flex flex-col justify-between p-5 relative">
-                                    <div className="text-[10px] font-mono text-slate-500 uppercase">Automated Data Table 05</div>
-                                    <div className="my-6 border border-slate-900/60 aspect-video rounded-xl bg-slate-950/40 overflow-hidden flex items-center justify-center">
-                                        <img 
-                                            src="assets/images/docking-affinities-matrix.png" 
-                                            alt="Docking Score Affinities Matrix" 
-                                            className="w-full h-full object-cover"
-                                            onError={(e) => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span class="text-[11px] text-slate-600 italic font-mono p-2 text-center">[Placeholder: Drag and Drop your Binding Affinities Score Table here]</span>'; }}
-                                        />
+                                    <div className="text-[10px] font-mono text-slate-500 uppercase flex justify-between">
+                                        <span>Automated Data Table 05</span>
+                                        <span className="text-purple-500 text-[9px]">🔍 Click to zoom</span>
+                                    </div>
+                                    <div className="my-6 border border-slate-900/60 aspect-video rounded-xl bg-slate-950/40 overflow-hidden">
+                                        <a href="assets/images/originals/docking-affinities-matrix.png" target="_blank" rel="noopener noreferrer" className="cursor-zoom-in block w-full h-full">
+                                            <img 
+                                                src="assets/images/thumbs/docking-affinities-matrix.webp" 
+                                                alt="Docking Score Affinities Matrix" 
+                                                loading="lazy"
+                                                className="w-full h-full object-cover transition duration-300 hover:scale-105"
+                                                onError={(e) => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span class="text-[11px] text-slate-600 italic font-mono p-2 text-center flex h-full items-center justify-center">[Missing Image File]</span>'; }}
+                                            />
+                                        </a>
                                     </div>
                                     <div>
                                         <h4 className="text-sm font-bold text-slate-200">Docking Score Affinities Matrix</h4>
@@ -638,14 +682,20 @@
 
                                 {/* 3D INTERACTION POSES MATRIX */}
                                 <div className="rounded-2xl bg-slate-950/90 border border-slate-800 overflow-hidden flex flex-col justify-between p-5 relative">
-                                    <div className="text-[10px] font-mono text-slate-500 uppercase">Automated Visualization 06</div>
-                                    <div className="my-6 border border-slate-900/60 aspect-video rounded-xl bg-slate-950/40 overflow-hidden flex items-center justify-center">
-                                        <img 
-                                            src="assets/images/3d-interaction-poses.png" 
-                                            alt="3D Interaction Docked Poses" 
-                                            className="w-full h-full object-cover"
-                                            onError={(e) => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span class="text-[11px] text-slate-600 italic font-mono p-2 text-center">[Placeholder: Drag and Drop your 3D Ligand-Residue Interaction Pose Diagrams here]</span>'; }}
-                                        />
+                                    <div className="text-[10px] font-mono text-slate-500 uppercase flex justify-between">
+                                        <span>Automated Visualization 06</span>
+                                        <span className="text-purple-500 text-[9px]">🔍 Click to zoom</span>
+                                    </div>
+                                    <div className="my-6 border border-slate-900/60 aspect-video rounded-xl bg-slate-950/40 overflow-hidden">
+                                        <a href="assets/images/originals/3d-interaction-poses.png" target="_blank" rel="noopener noreferrer" className="cursor-zoom-in block w-full h-full">
+                                            <img 
+                                                src="assets/images/thumbs/3d-interaction-poses.webp" 
+                                                alt="3D Interaction Docked Poses" 
+                                                loading="lazy"
+                                                className="w-full h-full object-cover transition duration-300 hover:scale-105"
+                                                onError={(e) => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span class="text-[11px] text-slate-600 italic font-mono p-2 text-center flex h-full items-center justify-center">[Missing Image File]</span>'; }}
+                                            />
+                                        </a>
                                     </div>
                                     <div>
                                         <h4 className="text-sm font-bold text-slate-200">3D Interaction Docked Poses</h4>
@@ -653,140 +703,67 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center text-xs font-medium font-mono pt-4">
-                                <div className="p-4 rounded-xl robotics-glass-light text-slate-300">📊 Ligand Core RMSD</div>
-                                <div className="p-4 rounded-xl robotics-glass-light text-slate-300">📊 Cofactor Trajectories</div>
-                                <div className="p-4 rounded-xl robotics-glass-light text-slate-300">📊 Residue Fluctuations (RMSF)</div>
-                            </div>
                         </section>
 
-                        {/* SECTION: PEER-REVIEWED METHODOLOGY EVIDENCE */}
+                        {/* LITERATURE BENCHMARKS SECTION */}
                         <section id="publications" className="space-y-8">
-                            <div className="border-l-2 border-purple-400 pl-4">
-                                <h2 className="font-display text-2xl font-bold text-white">Peer-Reviewed Validation Proof</h2>
-                                <p className="text-xs text-slate-400 mt-0.5">Established molecular docking and GROMACS methodology architectures published with <strong>Dr. Ravi Rawat</strong> as Lead Corresponding Author (*).</p>
+                            <div className="border-l-2 border-cyan-400 pl-4">
+                                <h2 className="font-display text-2xl font-bold text-white">Literature Benchmarks & Validations</h2>
+                                <p className="text-xs text-slate-400 mt-0.5">Our simulation architectures strictly align with high-tier peer-reviewed operational methodologies.</p>
                             </div>
 
-                            <div className="space-y-4 max-w-6xl">
-                                {[
-                                    {
-                                        cite: "Ravi Rawat*, Kant, K.; Kumar, A.; Bhati, K.; Verma, S. M. HeroMDAnalysis: An Automagical tool for GROMACS based Molecular Dynamics Simulation Analysis. Future Medicinal Chemistry, 2021, 13(5), 447-456. DOI: 10.4155/fmc-2020-0191",
-                                        factor: "4.768"
-                                    },
-                                    {
-                                        cite: "Uniyal, P.; Pramanik, S. D.; Pandey, S.; Shukla, P.; Roy, P.; Padrashar, D.; Gupta, S.; Ravi Rawat*, Gaurav, A.; Lee, V. S. Synergistic combinatorial anticancer potential of Tamoxifen with Naringin and Diosmetin in MCF-7 breast cancer cells and their liposomal delivery. Scientific Reports. 2026, 10.1038/s41598-026-37954-5",
-                                        factor: "4.5"
-                                    },
-                                    {
-                                        cite: "Ravi Rawat*, Verma, S. M. An exclusive computational insight toward molecular mechanism of MMV007571, a multitarget inhibitor of Plasmodium falciparum. Journal of Biomolecular Structure and Dynamics, 2020, 38(18), 5362-5373. DOI: 10.1080/07391102.2019.1700165",
-                                        factor: "5.235"
-                                    },
-                                    {
-                                        cite: "Ravi Rawat*, Verma, S. M. High-throughput virtual screening approach involving pharmacophore mapping, ADME filtering, molecular docking and MM-GBSA to identify new dual target inhibitors of PfDHODH and PfCytbc1 complex to combat drug resistant malaria. Journal of Biomolecular Structure and Dynamics, 2021, 39(14), 5148-5159. DOI: 10.1080/07391102.2020.1784288",
-                                        factor: "5.235"
-                                    },
-                                    {
-                                        cite: "Ravi Rawat*, Molecular Docking and Simulation Studies of Outer Membrane Proteins with piperacillin; a broad-spectrum antibiotic against Pseudomonas aeruginosa. Journal of Biomolecular Structure and Dynamics, 2025, DOI: 10.1080/07391102.2025.2499949",
-                                        factor: "5.235"
-                                    },
-                                    {
-                                        cite: "Choudhary, D.; Kaur, R.; Rani, N.; Kumar, B.; Singh, T. G.; Chandrasekaran, B.; Ravi Rawat*, Eyupoglu, V. Insights into in silico analysis to explore the multitarget antidepressant role of Camellia sinensis. Journal of Biomolecular Structure and Dynamics, 2025, DOI: 10.1080/07391102.2025.2498625",
-                                        factor: "5.235"
-                                    }
-                                ].map((item, idx) => (
-                                    <div key={idx} className="p-4 rounded-xl bg-slate-950/40 border border-slate-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs">
-                                        <p className="text-slate-300 leading-relaxed flex-1">
-                                            <span className="text-slate-600 font-mono inline-block w-6 font-bold">{idx+1}.</span>
-                                            {item.cite.split("Ravi Rawat*")[0]}
-                                            <strong className="text-white underline">Ravi Rawat*</strong>
-                                            {item.cite.split("Ravi Rawat*")[1]}
-                                        </p>
-                                        <div className="bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 font-mono text-[10px] px-2 py-0.5 rounded font-bold">
-                                            Impact Factor: {item.factor}
-                                        </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="p-6 rounded-2xl bg-slate-950/40 border border-slate-900 space-y-4">
+                                    <div className="flex items-center justify-between text-[10px] font-mono text-slate-500">
+                                        <span>STANDARD PARAMETRIC ALIGNMENT</span>
+                                        <span className="text-cyan-400">ACS / Elsevier Compliant</span>
                                     </div>
-                                ))}
+                                    <h4 className="text-base font-bold text-slate-200">Force Field Harmonization</h4>
+                                    <p className="text-xs text-slate-400 leading-relaxed">
+                                        All automated topologies execute parameters within the context of CHARMM36m or AMBER99SB-ILDN setups, combined with TIP3P water models. Long-range electrostatic forces are mapped dynamically via Particle Mesh Ewald (PME) equations to produce publication-ready thermodynamic equilibrium curves.
+                                    </p>
+                                </div>
+
+                                <div className="p-6 rounded-2xl bg-slate-950/40 border border-slate-900 space-y-4">
+                                    <div className="flex items-center justify-between text-[10px] font-mono text-slate-500">
+                                        <span>REPRODUCIBILITY TRACKING Matrix</span>
+                                        <span className="text-purple-400">Open-Science Principles</span>
+                                    </div>
+                                    <h4 className="text-base font-bold text-slate-200">Root-Mean-Square Deviations & Thermodynamic States</h4>
+                                    <p className="text-xs text-slate-400 leading-relaxed">
+                                        The raw energy data matrices, pressure tensors, and temperature grids generated during execution are fully saved and compressed into portable .xvg formats, enabling investigators to seamlessly reload their timelines directly inside standalone desktop platforms.
+                                    </p>
+                                </div>
                             </div>
                         </section>
 
-                        {/* CONFIGURATION FRAMEWORK FAQS */}
-                        <section id="faqs" className="max-w-5xl mx-auto space-y-8">
-                            <div className="text-center space-y-2">
-                                <h2 className="font-display text-2xl font-bold text-white">Operational Framework FAQ</h2>
-                                <p className="text-xs text-slate-400">Clear scientific guidelines across Docking and Dynamics workflows.</p>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs leading-relaxed">
-                                <div className="p-5 rounded-2xl bg-slate-950/80 border border-slate-900 space-y-3">
-                                    <h4 className="font-bold text-cyan-400 uppercase tracking-wide">1. How is AI integrated into the workflow, and how does it enhance efficiency?</h4>
-                                    <p className="text-slate-400">We utilize specialized AI agents across five critical stages of the project lifecycle. This integration reduces human error, accelerates delivery times, and provides a level of analytical depth that standard automated tools cannot reach.</p>
-                                    <ul className="space-y-2 pl-2 border-l border-cyan-500/20 text-slate-300 font-sans">
-                                        <li><strong>Stage 1: Structural Curation & PDB Repair</strong> — AI-driven structural bioinformatics tools scan your PDB files for missing residues, broken loops, and incorrect protonation states in seconds to ensure stable MD runs.</li>
-                                        <li><strong>Stage 2: Forcefield & Ligand Parameterization</strong> — For novel compounds, AI agents determine appropriate partial charges and bond parameters compatible with GROMACS/Amber forcefields without manual topology tweaking.</li>
-                                        <li><strong>Stage 3: Intelligent Screening & Scoring</strong> — AI heuristics pre-filter ligand libraries and optimize binding pose selection based on historical "hit" patterns, keeping execution costs significantly lower.</li>
-                                        <li><strong>Stage 4: Trajectory Pattern Recognition</strong> — Dynamic AI observers monitor trajectories on AMD GPU clusters to spot pocket-closing or structural shifts, isolating the most scientifically critical frame sequences.</li>
-                                        <li><strong>Stage 5: Multi-Modal Report & Interpretation</strong> — Multimodal AI agents synthesize energy matrices into structured scientific discussions, mapping Pi-stacking, H-bonds, and Salt Bridges directly into drafted manuscripts.</li>
-                                    </ul>
-                                </div>
-
-                                <div className="p-5 rounded-2xl bg-slate-950/80 border border-slate-900 space-y-3 flex flex-col justify-between">
-                                    <div>
-                                        <h4 className="font-bold text-cyan-400 uppercase tracking-wide">2. How are AMD Radeon™ GPU clusters utilized to maintain "Scholar-Tier" pricing?</h4>
-                                        <p className="text-slate-400">We have optimized our computational kernels to run on High-Performance AMD Radeon™ GPU clusters using open-source parallel architectures (ROCm). By bypassing the high licensing costs associated with proprietary hardware ecosystems, we achieve high-throughput docking and nanosecond-scale MD simulations at a fraction of the cost. These savings allow us to offer institutional-grade results to individual PhD and Master's scholars within their budget.</p>
-                                    </div>
-                                    <div className="border-t border-slate-900 pt-3">
-                                        <h4 className="font-bold text-cyan-400 uppercase tracking-wide">3. What level of detail is included in the "Specific Interaction Analysis"?</h4>
-                                        <p className="text-slate-400">Unlike automated platforms that only provide raw binding energy, our multi-modal agents perform a deep-dive Structural Interpretation. Your report will explicitly identify and discuss specific molecular interactions—such as Pi-stacking with aromatic residues (e.g., Phe/Tyr), Hydrogen bonding networks, and Hydrophobic pocket fit. We don't just give you a number; we tell you why your molecule is a potential lead.</p>
-                                    </div>
-                                </div>
-
-                                <div className="p-5 rounded-2xl bg-slate-950/80 border border-slate-900 space-y-2">
-                                    <h4 className="font-bold text-cyan-400 uppercase tracking-wide">4. What specific deliverables are included in the final project package?</h4>
-                                    <p className="text-slate-400">We deliver a comprehensive, "submission-ready" bundle that includes:</p>
-                                    <ul className="list-disc pl-4 space-y-1 text-slate-300">
-                                        <li><strong>Detailed Report:</strong> Methodology, Results, Results Interpretation, and Conclusion.</li>
-                                        <li><strong>Visual Assets:</strong> High-Definition (HD) publication-grade images of binding poses.</li>
-                                        <li><strong>Data Assets:</strong> Raw Trajectory files, interaction tables, and energy matrices.</li>
-                                        <li><strong>Presentation Ready:</strong> A custom PowerPoint (PPT) slide deck summarizing the project for your thesis or lab meetings.</li>
-                                    </ul>
-                                </div>
-
-                                <div className="p-5 rounded-2xl bg-slate-950/80 border border-slate-900 space-y-2">
-                                    <h4 className="font-bold text-cyan-400 uppercase tracking-wide">5. Can I track the progress of my GPU-assigned tasks in real-time?</h4>
-                                    <p className="text-slate-400">Yes. Every project is assigned a dedicated GPU queue. Once you submit your PDB and Ligands, you will receive a Live Tracking URL. You can monitor the workflow status as it moves through:</p>
-                                    <ol className="list-decimal pl-4 space-y-1 text-slate-300 font-mono text-[11px]">
-                                        <li>Phase 1: AI PDB Repair & Parameterization</li>
-                                        <li>Phase 2: Screening & Docking</li>
-                                        <li>Phase 3: GPU-Accelerated MD Run</li>
-                                        <li>Phase 4: Multi-modal Agent Analysis & Report Synthesis</li>
-                                    </ol>
-                                </div>
-                            </div>
-                        </section>
                     </main>
 
-                    {/* SECOND INTEGRATED LOCATION: FIXED FLOATING WHATSAPP BUTTON (BOTTOM-RIGHT) */}
-                    <div className="fixed bottom-6 right-6 z-50">
-                        <a href={generateWhatsappLink()} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-3.5 rounded-full shadow-xl transition text-xs tracking-wider uppercase">
-                            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.713-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.965C16.428 1.978 13.96 1.957 12.008 1.957c-5.444 0-9.866 4.372-9.87 9.802 0 1.726.48 3.408 1.39 4.888l-.997 3.642 3.726-.975zM17.56 15.14c-.301-.15-1.781-.879-2.056-.979-.275-.1-.475-.15-.675.15-.2.3-.775.979-.95 1.179-.175.2-.35.225-.651.075-.301-.15-1.27-.468-2.42-1.494-.894-.797-1.498-1.782-1.673-2.081-.175-.3-.018-.462.132-.61.135-.134.301-.35.451-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.675-1.625-.925-2.225-.244-.589-.493-.51-.675-.52-.175-.01-.375-.01-.575-.01-.2 0-.525.075-.8 1.05-.275.979-1.05 3.1-1.05 3.125 0 .025.324 1.756 1.701 3.064 1.3 1.232 2.599 1.8 3.52 1.8.922 0 1.63-.124 2.22-.213.66-.099 1.78-.727 2.03-1.43.25-.702.25-1.3.175-1.43-.075-.125-.275-.2-.575-.35z"/></svg>
-                            WhatsApp Assistance Desk
-                        </a>
-                    </div>
-
-                    {/* FOOTER */}
-                    <footer className="border-t border-slate-900 bg-slate-950 text-[11px] text-slate-500 py-10 text-center px-6">
-                        <p className="max-w-xl mx-auto mb-1.5">GROMACS Cloud Workspace with AI is an independent structural chemistry processing pipeline console. GROMACS® software distributions remain properties of their respective open-source copyright holders.</p>
-                        <p>© 2026 GROMACS Cloud Workspace with AI. Built and used under supervision of Dr. Ravi Rawat.</p>
+                    {/* CORE STATIC SCREEN TERMINAL FOOTER CONTAINER */}
+                    <footer className="border-t border-slate-900 bg-slate-950/80 backdrop-blur-md mt-32 py-12 px-6 text-center text-xs text-slate-500 font-mono">
+                        <div className="max-w-7xl mx-auto space-y-4">
+                            <p>© 2026 GROMACS Cloud Workspace with AI Engine Layer. All mathematical nodes configured safely.</p>
+                            <div className="flex justify-center gap-6 text-[11px]">
+                                <a href="#pipeline" className="hover:text-cyan-400 transition">Node Topology Map</a>
+                                <span>•</span>
+                                <a href="#submission-console" className="hover:text-cyan-400 transition">Cluster Submission Deck</a>
+                                <span>•</span>
+                                <a href="#analytics" className="hover:text-purple-400 transition">Synthesized Report Pipelines</a>
+                            </div>
+                        </div>
                     </footer>
 
                 </div>
             );
         };
 
-        // BACKGROUND CANOPY GENERATION SCRIPT
-        window.addEventListener('DOMContentLoaded', () => {
-            const canvas = document.getElementById('mol-canvas');
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+
+        // Particle Canvas Molecular Network Background Engine
+        const canvas = document.getElementById('mol-canvas');
+        if (canvas) {
             const ctx = canvas.getContext('2d');
             let atoms = [];
 
@@ -797,7 +774,7 @@
             window.addEventListener('resize', resize);
             resize();
 
-            for (let i = 0; i < 45; i++) {
+            for (let i = 0; i < 65; i++) {
                 atoms.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
@@ -838,10 +815,7 @@
                 requestAnimationFrame(animate);
             }
             animate();
-        });
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        }
     </script>
 </body>
 </html>
