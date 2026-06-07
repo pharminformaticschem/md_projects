@@ -1,5 +1,4 @@
 {
-  "COLLAB100": { "value": 100 },
-  "WELCOME20": { "value": 20 },
-  "FESTIVAL50": { "value": 50 }
+  "SCHOLAR2026": { "pct": 30, "label": "Scholar Discount", "auto": true },
+  "PILOT10": { "pct": 10, "label": "Pilot Offer" }
 }
