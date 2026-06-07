@@ -1,0 +1,25 @@
+my-gromacs-project/
+│
+├── index.html
+└── assets/
+    ├── video/
+    │   └── bg-simulation.mp4
+    └── images/
+        ├── your-profile-pic.jpg
+        ├── rmsd-evolution-map.png
+        ├── mmpbsa-binding-energy.png
+        ├── pca-dynamics.png
+        ├── free-energy-landscape.png
+        ├── docking-affinities-matrix.png
+        └── 3d-interaction-poses.png
+        
+| Want to add...             | Edit this file                                         |
+| -------------------------- | ------------------------------------------------------ |
+| New service tier / pricing | globals.js → GMX.calculatePrice                        |
+| New analytics chart card   | globals.js → GMX.ANALYTICS_CARDS array                 |
+| New publication entry      | globals.js → GMX.PUBLICATIONS array                    |
+| New FAQ                    | globals.js → GMX.FAQS array                            |
+| New page section/block     | components.js (define) → app.js (place <NewSection />) |
+| New form field in Step 1/2 | app.js only                                            |
+| New nav link               | components.js → GMX.NavBar                             |
+| Contact number / email     | globals.js → GMX.CONTACT                               |

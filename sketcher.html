@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ketcher Cyberpunk Theme Bridge Canvas</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #040814;
+      overflow: hidden;
+      font-family: monospace;
+    }
+    
+    /* Layout Container Restyling Wrapper */
+    .sketcher-container {
+      position: relative;
+      width: 100%;
+      height: 460px;
+      background: #040814;
+    }
+
+    iframe#ketcher-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background-color: #040814;
+      /* CSS Filter matrix trick to shift default light editor elements to premium custom dark mode metrics */
+      filter: invert(0.9) hue-rotate(180deg) saturate(140%);
+    }
+
+    /* Loading placeholder overlay indicator matrix */
+    .loading-shield {
+      position: absolute;
+      inset: 0;
+      background: #02050e;
+      color: #06b6d4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      z-index: 50;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sketcher-container">
+    <div id="loader" class="loading-shield">Initializing Cyberpunk Vector Core Graphics...</div>
+    
+    <iframe id="ketcher-frame" src="ketcher/index.html?hiddenControls=molecules-mode,save,layout,cip,check,arom,dearom,analyse,recognize,miew,fullscreen,arrows,reaction-mapping-tools,reaction-plus,shape-ellipse,shape-rectangle,shape-line,text" onload="document.getElementById('loader').style.opacity=0;"></iframe>
+  </div>
+
+  <script type="text/javascript">
+    const iframeElement = document.getElementById('ketcher-frame');
+    let ketcherInstance = null;
+
+    // Continuous polling lookup routine to link with iframe content context references safely
+    const captureKetcherEngine = setInterval(() => {
+      try {
+        const targetKetcher = iframeElement.contentWindow && iframeElement.contentWindow.ketcher;
+        if (targetKetcher && targetKetcher.editor) {
+          clearInterval(captureKetcherEngine);
+          ketcherInstance = targetKetcher;
+          console.log("Ketcher background operational binding established.");
+        }
+      } catch (err) {
+        // Suppress initial cross-origin framing initialization warnings safely
+      }
+    }, 200);
+
+    // Message listener hooked up to parent React component console triggers
+    window.addEventListener('message', (event) => {
+      if (event.data && event.data.action === 'extract-smiles') {
+        if (ketcherInstance) {
+          ketcherInstance.getSmiles().then((smilesString) => {
+            // Push captured molecular structural coordinates vector string data back to parent React window frame matrix context
+            window.parent.postMessage({
+              source: 'ketcher-bridge-payload',
+              smiles: smilesString || ''
+            }, '*');
+          }).catch((err) => {
+            console.error("Structure extraction mapping fault:", err);
+            window.parent.postMessage({ source: 'ketcher-bridge-payload', smiles: '' }, '*');
+          });
+        } else {
+          window.parent.postMessage({ source: 'ketcher-bridge-payload', smiles: '' }, '*');
+        }
+      }
+    });
+  </script>
+</body>
+</html>
