@@ -7,6 +7,22 @@
 
 window.GMX = window.GMX || {};
 
+// ── ASSET MANIFEST ────────────────────────────────────────────
+// Central registry for all media assets.
+// Update heroVideo with your real Cloudinary public ID when ready.
+// Usage anywhere in the app: GMX.ASSETS.heroVideo
+GMX.ASSETS = {
+    // Primary hero background video (Cloudinary delivery URL).
+    // Swap the path segment for your own uploaded public ID.
+    heroVideo: "https://res.cloudinary.com/demo/video/upload/placeholder.mp4",
+
+    // Poster image shown before the video loads / on slow connections.
+    heroPoster: "https://res.cloudinary.com/demo/image/upload/placeholder_poster.jpg",
+
+    // Logo mark used in the nav and meta tags.
+    logoMark:   "assets/images/logo-mark.svg",
+};
+
 // ── CONTACT CONFIG ───────────────────────────────────────────
 GMX.CONTACT = {
     email: "ravi.med.chem@gmail.com",
@@ -373,4 +389,4 @@ GMX.FAQS = [
     },
 ];
 
-console.log("[GMX] globals.js loaded ✔");
+console.log("[GMX] globals.js loaded ✔  |  ASSETS:", GMX.ASSETS);

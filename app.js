@@ -89,6 +89,25 @@
             }
         }, [formData.email]);
 
+        // ── HERO ENTRANCE ANIMATION ────────────────────────────
+        // Runs once on mount. gsap.context() scopes all selectors to the live
+        // DOM and hands back a revert() cleanup so GSAP cleans up on unmount.
+        // Targets are stamped with data-hero="*" attributes in the JSX below.
+        useEffect(() => {
+            const ctx = gsap.context(() => {
+                gsap.timeline({ defaults: { ease: 'power3.out' } })
+                    // 1. Badge pill fades up first
+                    .from('[data-hero="badge"]',    { opacity: 0, y: 20, duration: 0.55 })
+                    // 2. Headline sweeps up while badge is still settling
+                    .from('[data-hero="headline"]', { opacity: 0, y: 30, duration: 0.85 }, '-=0.30')
+                    // 3. Sub-paragraph follows closely behind
+                    .from('[data-hero="subpara"]',  { opacity: 0, y: 30, duration: 0.70 }, '-=0.60')
+                    // 4. Four status cards stagger in from below
+                    .from('[data-hero="card"]',     { opacity: 0, y: 30, duration: 0.60, stagger: 0.10 }, '-=0.45');
+            });
+            return () => ctx.revert(); // GSAP cleanup on unmount
+        }, []);
+
         // ── PRICING DERIVATIONS ────────────────────────────────
         const selectedPlan = useMemo(
             () => GMX.MD_PLANS.find(p => p.id === formData.planId) || GMX.MD_PLANS[1],
@@ -237,35 +256,54 @@
                 <main className="max-w-7xl mx-auto py-12 md:py-16 px-6 space-y-32">
 
                     {/* ── HERO SECTION ───────────────────────────── */}
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    <section className="relative overflow-hidden rounded-2xl">
+
+                        {/* Cinematic background video ─ source driven by GMX.ASSETS.heroVideo.
+                            autoPlay + muted is required by browsers for auto-play to work.
+                            playsInline prevents full-screen takeover on iOS Safari.         */}
+                        <video
+                            src={GMX.ASSETS.heroVideo}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            className="absolute inset-0 w-full h-full object-cover z-0"
+                        />
+
+                        {/* Dark overlay — bg-slate-950/80 keeps cyan/purple text highly legible
+                            regardless of what the video frame shows at any given moment.     */}
+                        <div className="absolute inset-0 bg-slate-950/80 z-[1]" />
+
+                        {/* All hero content sits on top of the video + overlay */}
+                        <div className="relative z-[2] grid grid-cols-1 lg:grid-cols-12 gap-12 items-center py-8">
 
                         {/* LEFT SIDE TEXT MATRIX */}
                         <div className="lg:col-span-6 space-y-6">
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-cyan-500/20 bg-cyan-500/5 text-cyan-300 text-xs font-mono">
+                            <div data-hero="badge" className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-cyan-500/20 bg-cyan-500/5 text-cyan-300 text-xs font-mono">
                                 ⚙️ Dedicated AMD ROCm™ Linux Architecture
                             </div>
-                            <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-white leading-none">
+                            <h1 data-hero="headline" className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-white leading-none">
                                 Automated Docking, MDRun, and <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">Reports on Demand</span>
                             </h1>
-                            <p className="text-slate-300 text-sm leading-relaxed">
+                            <p data-hero="subpara" className="text-slate-300 text-sm leading-relaxed">
                                 Accelerate your drug discovery workflow with end-to-end automation. Stream your compound libraries through docking, launch production-grade molecular dynamics instantly, and receive presentation-ready reports from a single unified console.
                             </p>
 
                             {/* QUICK STATUS CARDS */}
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                                <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800">
+                                <div data-hero="card" className="p-4 rounded-xl bg-slate-950/70 border border-slate-800">
                                     <div className="text-[10px] text-slate-500 font-mono uppercase">Targets</div>
                                     <div className="text-xl font-bold text-white">{validProteinCount}</div>
                                 </div>
-                                <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800">
+                                <div data-hero="card" className="p-4 rounded-xl bg-slate-950/70 border border-slate-800">
                                     <div className="text-[10px] text-slate-500 font-mono uppercase">Test Ligands</div>
                                     <div className="text-xl font-bold text-cyan-300">{testLigandCount}</div>
                                 </div>
-                                <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800">
+                                <div data-hero="card" className="p-4 rounded-xl bg-slate-950/70 border border-slate-800">
                                     <div className="text-[10px] text-slate-500 font-mono uppercase">Controls</div>
                                     <div className="text-xl font-bold text-purple-300">{controlLigandCount}</div>
                                 </div>
-                                <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800">
+                                <div data-hero="card" className="p-4 rounded-xl bg-slate-950/70 border border-slate-800">
                                     <div className="text-[10px] text-slate-500 font-mono uppercase">MD Runs</div>
                                     <div className="text-xl font-bold text-emerald-300">{totalRuns}</div>
                                 </div>
@@ -391,8 +429,9 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </div>{/* end right column */}
+                    </div>{/* end hero grid */}
+                    </section>{/* end hero section */}
 
                     <PipelineSection />
 

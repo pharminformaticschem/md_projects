@@ -8,7 +8,12 @@
 window.GMX = window.GMX || {};
 
 (function () {
-    const { useEffect, useMemo } = React;
+    const { useState, useEffect, useMemo, useRef } = React;
+
+    // Register GSAP ScrollTrigger plugin once (safe to call multiple times)
+    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+        gsap.registerPlugin(ScrollTrigger);
+    }
 
     // ── SMALL HELPERS ─────────────────────────────────────────
     function statusClass(status) {
@@ -179,7 +184,7 @@ window.GMX = window.GMX || {};
                         type="button"
                         onClick={onRequestOtp}
                         disabled={busy || !email}
-                        className="btn-action px-5 py-3 rounded-xl font-bold text-white text-xs uppercase tracking-widest disabled:opacity-60"
+                        className="btn-action px-5 py-3 rounded-xl font-bold text-white text-xs uppercase tracking-widest disabled:opacity-60 transition-transform hover:-translate-y-0.5 hover:shadow-md hover:shadow-cyan-500/20"
                     >
                         {busy ? 'Processing...' : 'Continue'}
                     </button>
@@ -199,7 +204,7 @@ window.GMX = window.GMX || {};
                                 onChange={e => onOtpChange && onOtpChange(e.target.value)}
                             />
                         </div>
-                        <button type="button" onClick={onVerifyOtp} disabled={busy || otp.length < 4} className="btn-action px-5 py-3 rounded-xl font-bold text-white text-xs uppercase tracking-widest disabled:opacity-60">
+                        <button type="button" onClick={onVerifyOtp} disabled={busy || otp.length < 4} className="btn-action px-5 py-3 rounded-xl font-bold text-white text-xs uppercase tracking-widest disabled:opacity-60 transition-transform hover:-translate-y-0.5 hover:shadow-md hover:shadow-cyan-500/20">
                             Verify OTP
                         </button>
                         <button type="button" onClick={onResendOtp} disabled={busy || !email} className="px-5 py-3 rounded-xl border border-slate-700 text-slate-300 text-xs uppercase tracking-widest hover:border-cyan-500/40 hover:text-white transition disabled:opacity-60">
@@ -238,7 +243,7 @@ window.GMX = window.GMX || {};
                     <div className="rounded-xl bg-slate-900/60 border border-slate-800 p-3 text-slate-300"><span className="text-slate-500">Phone:</span> {profile.countryCode || ''} {profile.phone || '—'}</div>
                 </div>
                 <div className="flex flex-wrap gap-3">
-                    <button type="button" onClick={onApply} className="btn-action px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-widest text-white">Apply Saved Details</button>
+                    <button type="button" onClick={onApply} className="btn-action px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-widest text-white transition-transform hover:-translate-y-0.5 hover:shadow-md hover:shadow-cyan-500/20">Apply Saved Details</button>
                     <button type="button" onClick={onEdit} className="px-4 py-3 rounded-xl border border-slate-700 text-slate-300 text-xs font-bold uppercase tracking-widest hover:text-white hover:border-slate-600 transition">Review / Edit</button>
                 </div>
             </div>
@@ -246,10 +251,45 @@ window.GMX = window.GMX || {};
     };
 
     // ── PLAN PICKER ──────────────────────────────────────────
+    // ScrollTrigger: fades in the whole picker block, then staggers each plan card.
     GMX.PlanPicker = function PlanPicker({ selectedPlanId, onSelect, includeApo, onToggleApo }) {
         const plans = GMX.MD_PLANS || [];
+        const pickerRef = useRef(null);
+
+        useEffect(() => {
+            if (typeof gsap === 'undefined' || !pickerRef.current) return;
+            const ctx = gsap.context(() => {
+                // Fade-in + translate the whole picker block
+                gsap.from(pickerRef.current, {
+                    opacity: 0,
+                    y: 50,
+                    duration: 0.85,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                        trigger: pickerRef.current,
+                        start: 'top 88%',
+                        toggleActions: 'play none none none',
+                    },
+                });
+                // Stagger the individual plan cards
+                gsap.from('.plan-picker-card', {
+                    opacity: 0,
+                    y: 25,
+                    duration: 0.55,
+                    stagger: 0.1,
+                    ease: 'power2.out',
+                    scrollTrigger: {
+                        trigger: pickerRef.current,
+                        start: 'top 85%',
+                        toggleActions: 'play none none none',
+                    },
+                });
+            }, pickerRef);
+            return () => ctx.revert();
+        }, []);
+
         return (
-            <div className="space-y-4">
+            <div ref={pickerRef} className="space-y-4">
                 <div className="flex items-center justify-between gap-4">
                     <div>
                         <h4 className="text-white font-bold text-sm uppercase tracking-widest font-mono">Simulation Plan Builder</h4>
@@ -265,7 +305,7 @@ window.GMX = window.GMX || {};
                                 key={plan.id}
                                 type="button"
                                 onClick={() => onSelect && onSelect(plan.id)}
-                                className={`rounded-2xl border p-4 text-left transition ${active ? 'border-cyan-400/60 bg-cyan-500/10 shadow-[0_0_18px_rgba(6,182,212,0.18)]' : 'border-slate-800 bg-slate-950/40 hover:border-slate-700'}`}
+                                className={`plan-picker-card rounded-2xl border p-4 text-left transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:shadow-cyan-500/20 ${active ? 'border-cyan-400/60 bg-cyan-500/10 shadow-[0_0_18px_rgba(6,182,212,0.18)]' : 'border-slate-800 bg-slate-950/40 hover:border-slate-700'}`}
                             >
                                 <div className="flex items-center justify-between gap-2 mb-2">
                                     <div className={`text-sm font-bold ${active ? 'text-cyan-200' : 'text-white'}`}>{plan.label}</div>
@@ -281,7 +321,7 @@ window.GMX = window.GMX || {};
                 <button
                     type="button"
                     onClick={onToggleApo}
-                    className={`w-full rounded-2xl border p-4 flex items-start justify-between gap-4 transition ${includeApo ? 'border-purple-400/60 bg-purple-500/10' : 'border-slate-800 bg-slate-950/40 hover:border-slate-700'}`}
+                    className={`w-full rounded-2xl border p-4 flex items-start justify-between gap-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm hover:shadow-purple-500/20 ${includeApo ? 'border-purple-400/60 bg-purple-500/10' : 'border-slate-800 bg-slate-950/40 hover:border-slate-700'}`}
                 >
                     <div className="flex items-start gap-3 text-left">
                         <span className={`mt-0.5 h-5 w-5 rounded-md border flex items-center justify-center ${includeApo ? 'bg-purple-500 border-purple-400' : 'border-slate-600 bg-slate-900'}`}>
@@ -333,15 +373,16 @@ window.GMX = window.GMX || {};
                             <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-slate-300"><span className="text-slate-500">Amount:</span> ₹{Number(instructions.amountInr || 0).toLocaleString()}</div>
                             <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-slate-300"><span className="text-slate-500">Bank:</span> {instructions.bankName}</div>
                             <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-slate-300"><span className="text-slate-500">IFSC:</span> {instructions.bankIfsc}</div>
-                            <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-slate-300 sm:col-span-2"><span className="text-slate-500">Note:</span> {instructions.note}</div>
+                            <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-slate-300"><span className="text-slate-500">Account:</span> {instructions.bankAccount}</div>
+                            <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-slate-300"><span className="text-slate-500">Note:</span> {instructions.note}</div>
                         </div>
 
                         <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 text-xs text-amber-100">
-                            Clicking “I Have Paid” does not auto-approve the job. It only places the payment into verification review.
+                            Clicking "I Have Paid" does not auto-approve the job. It only places the payment into verification review.
                         </div>
 
                         <div className="flex flex-wrap gap-3">
-                            <button type="button" onClick={onMarkPaid} className="btn-action px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-widest text-white">I Have Paid</button>
+                            <button type="button" onClick={onMarkPaid} className="btn-action px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-widest text-white transition-transform hover:-translate-y-0.5 hover:shadow-md hover:shadow-cyan-500/20">I Have Paid</button>
                             <button type="button" onClick={onRetry} className="px-4 py-3 rounded-xl border border-slate-700 text-slate-300 text-xs font-bold uppercase tracking-widest hover:text-white hover:border-slate-600 transition">Attempt Payment Again</button>
                         </div>
                     </div>
@@ -439,17 +480,52 @@ window.GMX = window.GMX || {};
     };
 
     // ── ANALYTICS SECTION ────────────────────────────────────
+    // ScrollTrigger: the whole section fades up, then analytics cards stagger in.
     GMX.AnalyticsSection = function AnalyticsSection() {
         const cards = GMX.ANALYTICS_CARDS || [];
+        const sectionRef = useRef(null);
+
+        useEffect(() => {
+            if (typeof gsap === 'undefined' || !sectionRef.current) return;
+            const ctx = gsap.context(() => {
+                // Section container fades up first
+                gsap.from(sectionRef.current, {
+                    opacity: 0,
+                    y: 50,
+                    duration: 0.9,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                        trigger: sectionRef.current,
+                        start: 'top 85%',
+                        toggleActions: 'play none none none',
+                    },
+                });
+                // Each card staggers in behind the section
+                gsap.from('.analytics-card', {
+                    opacity: 0,
+                    y: 30,
+                    duration: 0.6,
+                    stagger: 0.1,
+                    ease: 'power2.out',
+                    scrollTrigger: {
+                        trigger: sectionRef.current,
+                        start: 'top 80%',
+                        toggleActions: 'play none none none',
+                    },
+                });
+            }, sectionRef);
+            return () => ctx.revert();
+        }, []);
+
         return (
-            <section id="analytics" className="space-y-8">
+            <section id="analytics" ref={sectionRef} className="space-y-8">
                 <div className="border-l-2 border-cyan-400 pl-4">
                     <h2 className="font-display text-2xl font-bold text-white">Automated Comprehensive Analytics Suite</h2>
                     <p className="text-xs text-slate-400 mt-0.5">High-resolution scientific metrics are automatically synthesized and outputted directly inside your complete production bundle at no extra charge.</p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {cards.map((card, idx) => (
-                        <div key={idx} className="rounded-2xl bg-slate-950/90 border border-slate-800 overflow-hidden flex flex-col justify-between p-5 relative">
+                        <div key={idx} className="analytics-card rounded-2xl bg-slate-950/90 border border-slate-800 overflow-hidden flex flex-col justify-between p-5 relative">
                             <div className="text-[10px] font-mono text-slate-500 uppercase flex justify-between">
                                 <span>{card.label}</span>
                                 <span className="text-cyan-500 text-[9px]">🔍 Click to zoom</span>
@@ -585,9 +661,250 @@ window.GMX = window.GMX || {};
                         </div>
                     </div>
 
-                    <button type="button" onClick={extractCurrent} className="w-full btn-action py-3 rounded-xl font-bold text-white text-xs uppercase tracking-widest">
+                    <button type="button" onClick={extractCurrent} className="w-full btn-action py-3 rounded-xl font-bold text-white text-xs uppercase tracking-widest transition-transform hover:-translate-y-0.5 hover:shadow-md hover:shadow-cyan-500/20">
                         ✔ Extract SMILES to Ligand Row
                     </button>
+                </div>
+            </div>
+        );
+    };
+
+    // ── PIPELINE SECTION ─────────────────────────────────────
+    // ScrollTrigger: the section header fades up, then each step card staggers in.
+    GMX.PipelineSection = function PipelineSection() {
+        const sectionRef = useRef(null);
+
+        useEffect(() => {
+            if (typeof gsap === 'undefined' || !sectionRef.current) return;
+            const ctx = gsap.context(() => {
+                // Whole section translates up on scroll-in
+                gsap.from(sectionRef.current, {
+                    opacity: 0,
+                    y: 50,
+                    duration: 0.9,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                        trigger: sectionRef.current,
+                        start: 'top 85%',
+                        toggleActions: 'play none none none',
+                    },
+                });
+                // Step cards stagger in
+                gsap.from('.pipeline-step-card', {
+                    opacity: 0,
+                    y: 30,
+                    duration: 0.6,
+                    stagger: 0.12,
+                    ease: 'power2.out',
+                    scrollTrigger: {
+                        trigger: sectionRef.current,
+                        start: 'top 80%',
+                        toggleActions: 'play none none none',
+                    },
+                });
+            }, sectionRef);
+            return () => ctx.revert();
+        }, []);
+
+        const steps = [
+            {
+                icon: '🔬',
+                num: '01',
+                title: 'Protein Preparation',
+                desc: 'PDB code or file upload. Multi-chain support with ligand/cofactor detection. Automatic protonation using AMBER14sb + TIP3P water model.',
+                tag: 'Input',
+                accent: 'border-cyan-500/30 hover:border-cyan-500/60 hover:shadow-cyan-500/10',
+            },
+            {
+                icon: '🧪',
+                num: '02',
+                title: 'Ligand Parameterization',
+                desc: 'SMILES, SDF, or sketched structures. GAFF2 force-field via Antechamber. AM1-BCC partial charge generation with OpenBabel geometry optimization.',
+                tag: 'Chemistry',
+                accent: 'border-purple-500/30 hover:border-purple-500/60 hover:shadow-purple-500/10',
+            },
+            {
+                icon: '⚙️',
+                num: '03',
+                title: 'Docking & Pose Ranking',
+                desc: 'AutoDock Vina 1.2 with Exhaustiveness-32. Top-N poses RMSD-clustered. Best binding pose auto-selected as the MD simulation seed.',
+                tag: 'Docking',
+                accent: 'border-amber-500/30 hover:border-amber-500/60 hover:shadow-amber-500/10',
+            },
+            {
+                icon: '🚀',
+                num: '04',
+                title: 'MD Production Run',
+                desc: 'Full GROMACS 2024 solvated NPT equilibration followed by production MD. Scalable from 100 ps to 1 µs per trajectory.',
+                tag: 'Dynamics',
+                accent: 'border-emerald-500/30 hover:border-emerald-500/60 hover:shadow-emerald-500/10',
+            },
+            {
+                icon: '📊',
+                num: '05',
+                title: 'AI Analytics Report',
+                desc: 'Auto-computed RMSD, RMSF, Rg, PCA, FEL, H-bond, MM-PBSA/GBSA. LLM-generated multimodal PDF report with trajectory visualizations.',
+                tag: 'Output',
+                accent: 'border-cyan-500/30 hover:border-cyan-400/60 hover:shadow-cyan-500/10',
+            },
+        ];
+
+        return (
+            <section id="pipeline" ref={sectionRef} className="space-y-10">
+                <div className="border-l-2 border-purple-400 pl-4">
+                    <h2 className="font-display text-2xl font-bold text-white">End-to-End Automated Pipeline</h2>
+                    <p className="text-xs text-slate-400 mt-0.5">From receptor PDB ID to publication-ready MD report — fully automated with Human-in-the-Loop validation at every key checkpoint.</p>
+                </div>
+
+                <div className="relative">
+                    {/* Subtle connector line visible on desktop */}
+                    <div className="hidden lg:block absolute top-8 left-8 right-8 h-px bg-gradient-to-r from-transparent via-slate-700/60 to-transparent pointer-events-none" />
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+                        {steps.map((step, idx) => (
+                            <div
+                                key={idx}
+                                className={`pipeline-step-card relative rounded-2xl bg-slate-950/80 border p-5 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${step.accent}`}
+                            >
+                                {/* Step number watermark */}
+                                <div className="absolute top-3 right-4 text-[10px] font-mono text-slate-700 font-bold select-none">{step.num}</div>
+
+                                <span className="text-2xl">{step.icon}</span>
+
+                                <div className="space-y-1.5">
+                                    <span className="text-[9px] font-mono uppercase tracking-widest text-slate-500 px-2 py-0.5 bg-slate-900 rounded-full w-fit block border border-slate-800">{step.tag}</span>
+                                    <h4 className="text-sm font-bold text-white leading-tight">{step.title}</h4>
+                                </div>
+                                <p className="text-xs text-slate-400 leading-relaxed">{step.desc}</p>
+
+                                {/* Active connector dot (desktop) */}
+                                <div className="hidden lg:block absolute -right-2.5 top-6 h-4 w-4 rounded-full bg-slate-900 border border-slate-700 z-10 last:hidden" />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Bottom summary strip */}
+                <div className="flex flex-wrap items-center justify-center gap-6 p-4 rounded-2xl bg-slate-950/60 border border-slate-900 text-[11px] font-mono text-slate-500">
+                    <span className="text-cyan-400 font-bold">AutoDock Vina 1.2</span>
+                    <span className="text-slate-700">·</span>
+                    <span className="text-purple-400 font-bold">GROMACS 2024</span>
+                    <span className="text-slate-700">·</span>
+                    <span>AMBER14sb + GAFF2</span>
+                    <span className="text-slate-700">·</span>
+                    <span>AM1-BCC Charges</span>
+                    <span className="text-slate-700">·</span>
+                    <span className="text-emerald-400 font-bold">ROCm Radeon™ GPU Accelerated</span>
+                    <span className="text-slate-700">·</span>
+                    <span>LLM Report Generation</span>
+                </div>
+            </section>
+        );
+    };
+
+    // ── PRICING TABLE SECTION ────────────────────────────────
+    // Displays MD plans from GMX.MD_PLANS with hover micro-interactions on cards and CTA buttons.
+    GMX.PricingTableSection = function PricingTableSection() {
+        const plans = GMX.MD_PLANS || [];
+
+        return (
+            <section id="pricing" className="space-y-10">
+                <div className="border-l-2 border-cyan-400 pl-4">
+                    <h2 className="font-display text-2xl font-bold text-white">Transparent Simulation Pricing</h2>
+                    <p className="text-xs text-slate-400 mt-0.5">Scholar discount auto-applied. All plans include full analytics suite (RMSD, RMSF, PCA, FEL, H-bond, MM-PBSA) and an LLM-generated multimodal report.</p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    {plans.map((plan, idx) => (
+                        <div
+                            key={plan.id || idx}
+                            className="group relative rounded-2xl bg-slate-950/90 border border-slate-800 p-6 flex flex-col gap-4 transition-all duration-300 hover:-translate-y-1 hover:border-cyan-500/40 hover:shadow-lg hover:shadow-cyan-500/20 cursor-default"
+                        >
+                            {plan.badge && (
+                                <span className="absolute top-4 right-4 text-[9px] px-2 py-1 rounded-full border border-purple-500/30 bg-purple-500/10 text-purple-300 uppercase tracking-widest font-mono">
+                                    {plan.badge}
+                                </span>
+                            )}
+
+                            <div className="space-y-1">
+                                <h3 className="font-display text-lg font-bold text-white group-hover:text-cyan-100 transition-colors duration-200">{plan.label}</h3>
+                                <p className="text-xs text-cyan-400 font-mono">{plan.tag}</p>
+                            </div>
+
+                            <div className="space-y-0 text-xs flex-1">
+                                <div className="flex justify-between items-center py-2 border-b border-slate-900/80">
+                                    <span className="text-slate-500">Test Ligands</span>
+                                    <span className="font-bold text-white font-mono">{plan.testRuns}</span>
+                                </div>
+                                <div className="flex justify-between items-center py-2 border-b border-slate-900/80">
+                                    <span className="text-slate-500">Control Runs</span>
+                                    <span className="font-bold text-white font-mono">{plan.controlRuns}</span>
+                                </div>
+                                <div className="flex justify-between items-center py-2 border-b border-slate-900/80">
+                                    <span className="text-slate-500">Total MD Runs</span>
+                                    <span className="font-bold text-cyan-300 font-mono">{plan.totalRuns}</span>
+                                </div>
+                                <div className="pt-3 space-y-1.5 text-[11px] text-slate-500 leading-relaxed">
+                                    <div className="flex items-start gap-1.5"><span className="text-emerald-500 mt-0.5">✓</span><span>Full analytics suite included</span></div>
+                                    <div className="flex items-start gap-1.5"><span className="text-emerald-500 mt-0.5">✓</span><span>LLM multimodal report</span></div>
+                                    <div className="flex items-start gap-1.5"><span className="text-emerald-500 mt-0.5">✓</span><span>Raw trajectory outputs</span></div>
+                                    {plan.tip && <p className="text-slate-600 italic pt-1">{plan.tip}</p>}
+                                </div>
+                            </div>
+
+                            <a
+                                href="#submission-console"
+                                className="block w-full text-center py-3 rounded-xl btn-action font-bold text-white text-xs uppercase tracking-widest transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:shadow-cyan-500/20"
+                            >
+                                Select Plan →
+                            </a>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Pricing note and custom quote CTA */}
+                <div className="p-5 rounded-2xl bg-slate-950/40 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="space-y-1.5">
+                        <h4 className="text-sm font-bold text-white">Need a custom-scale run?</h4>
+                        <p className="text-xs text-slate-400 leading-relaxed">For large compound libraries, multi-target campaigns, µs-scale trajectories, or institutional bulk pricing — request a tailored quote directly.</p>
+                    </div>
+                    <a
+                        href={GMX.generateWhatsappLink ? GMX.generateWhatsappLink({}, [], []) : '#'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-shrink-0 py-3 px-5 rounded-xl border border-emerald-500/30 bg-emerald-600/10 text-emerald-400 text-xs font-mono font-bold transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-600/20 hover:shadow-md hover:shadow-emerald-500/20 whitespace-nowrap"
+                    >
+                        💬 Request Custom Quote
+                    </a>
+                </div>
+
+                {/* Scholar discount reminder */}
+                <div className="p-4 rounded-xl bg-cyan-500/5 border border-cyan-500/15 text-[11px] font-mono text-slate-400 text-center">
+                    <span className="text-cyan-400 font-bold">Scholar Discount</span> is automatically applied at checkout. Final price depends on atom count, trajectory duration, and your institution code.{' '}
+                    <a href="#submission-console" className="text-cyan-400 underline hover:text-cyan-300 transition">Configure your run</a> for a live estimate.
+                </div>
+            </section>
+        );
+    };
+
+    // ── LIGAND INFO PANEL ────────────────────────────────────
+    // Static informational hint panel rendered above the ligand row list.
+    // No props required — purely contextual guidance for the researcher.
+    GMX.LigandInfoPanel = function LigandInfoPanel() {
+        return (
+            <div className="rounded-xl border border-slate-800/80 bg-slate-950/50 px-4 py-3 text-[11px] font-mono leading-relaxed">
+                <div className="flex flex-wrap gap-x-6 gap-y-2">
+                    <span>
+                        <span className="text-cyan-400 font-bold">🧪 Test Ligand —</span>
+                        <span className="text-slate-400"> Novel compound being screened against the receptor target.</span>
+                    </span>
+                    <span>
+                        <span className="text-purple-400 font-bold">💊 Standard Control —</span>
+                        <span className="text-slate-400"> Known binder used as a reference baseline for relative binding energy comparison.</span>
+                    </span>
+                </div>
+                <div className="mt-2 text-slate-600 italic">
+                    SMILES strings, SDF/MOL2 file uploads, and sketched structures are all supported. Name each compound clearly — labels appear verbatim in the analytics report.
                 </div>
             </div>
         );
